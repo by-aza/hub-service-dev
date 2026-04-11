@@ -137,9 +137,10 @@ body {
 
 /* Hover modern */
 .hub-card:hover {
-    background: rgba(255, 255, 255, 0.25);
-    transform: translateY(-3px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.18);
+    transform: translateY(-6px) scale(1.02);
+    background: rgba(255, 255, 255, 0.45);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.18);
+    backdrop-filter: blur(14px);
 }
 
 /* Efect de apăsare */
@@ -611,7 +612,7 @@ body.dark-mode {
 /* GRID pentru carduri */
 .hub-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
     padding: 20px;
 }
@@ -621,4 +622,27 @@ body.dark-mode {
     font-size: 1.1rem;
     font-weight: 600;
 }
+
+/* CARD MODERN – DESIGN DE BAZĂ */
+.hub-card {
+    background: rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    transition: all 0.25s ease;
+    cursor: pointer;
+    text-align: center;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+/* DARK MODE – CARD MODERN */
+body.dark-mode .hub-card {
+    background: rgba(30, 41, 59, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #e2e8f0;
+}
+
 
