@@ -1,5 +1,64 @@
 # Changelog
 
+# v0.0.9 — Flota Auto (API + Listă Mașini)
+**Data:** 14.04.2026  
+**Tip:** Feature Release + API Integration
+
+## 🚀 Funcționalități noi
+- Implementare **API Flota Auto** (Google Apps Script Web App).
+- Adăugat **doGet()** pentru citirea tuturor mașinilor în format JSON.
+- Adăugat **doPost()** pentru adăugare și modificare mașini.
+- Structură JSON completă: nr, VIN, marcă, RCA, ITP, Rovinietă, link acte, observații, rowIndex.
+- Creare **Web App nou (deployment v2)** cu acces „Anyone”.
+- Integrare completă HUB → API prin `fetch()`.
+
+## 🧩 Pagini noi / actualizate
+### `lista_auto.html` (nou)
+- Pagina principală a modulului Flota Auto.
+- Header premium „Flota Auto”.
+- Afișare carduri pentru fiecare mașină.
+- VIN afișat sub număr (copy‑friendly).
+- Culori dinamice pentru expirări (verde / galben / roșu).
+- Butoane:
+  - **✏️ Modifică**
+  - **📁 Acte**
+- Sortare logică: expirate → aproape expirate → restul.
+
+### Structură folder simplificată
+- `lista_auto.html`
+- `adauga.html`
+- `modifica.html` (în pregătire)
+
+## 🛠️ Optimizări & Fix-uri
+- Eliminat pagini inutile din modulul Flota Auto.
+- Corectat deploy-ul Web App (versiune veche fără `doGet()`).
+- Mutat scriptul în proiectul corect (`verificaExpirari`).
+- Rezolvat eroarea „Script function not found: doGet”.
+- Stabilizat fluxul API (GET + POST).
+- Confirmat funcționarea JSON în browser.
+
+## 🎨 UI/UX
+- Carduri premium, aerisite, optimizate pentru mobil și PC.
+- VIN vizibil și ușor de copiat.
+- Culori intuitive pentru expirări.
+- Layout consistent cu restul HUB-ului.
+
+## 📁 Fișiere modificate
+- `modules/flota/lista_auto.html` (nou)
+- `modules/flota/adauga.html` (actualizat pentru API)
+- `modules/flota/modifica.html` (urmează)
+- `Cod.gs` (Google Apps Script):
+  - `doGet()` — nou
+  - `doPost()` — actualizat
+  - `verificaExpirari()` — nemodificat
+
+## 🧭 Ce urmează în v0.1.0
+- Pagina `modifica.html` cu preluare automată a datelor.
+- Căutare rapidă în lista de mașini.
+- Filtru după expirări.
+- Sortare manuală.
+- Export PDF pentru fișa unei mașini (opțional).
+
 ## v0.0.8 — 13 April 2026
 ### Adăugat
 - manifest.json cu nume aplicație, iconițe și setări pentru instalare pe Android/iPhone/PC
