@@ -4,7 +4,7 @@
 <head>
 
 <!-- Referința la manifest.json -->
-<link rel="manifest" href="/manifest.json">
+<link rel="manifest" href="manifest.json">
 
 <!-- Culoarea temei pentru bara de stare pe mobil -->
 <meta name="theme-color" content="#0078d7">
@@ -13,7 +13,7 @@
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js')
+      navigator.serviceWorker.register('sw.js')
         .then(registration => {
           console.log('Service Worker registered with scope:', registration.scope);
         })
