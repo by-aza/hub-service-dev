@@ -2,6 +2,29 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
+
+<!-- Referința la manifest.json -->
+<link rel="manifest" href="/manifest.json">
+
+<!-- Culoarea temei pentru bara de stare pe mobil -->
+<meta name="theme-color" content="#0078d7">
+
+<!-- Înregistrarea service worker-ului -->
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then(registration => {
+          console.log('Service Worker registered with scope:', registration.scope);
+        })
+        .catch(error => {
+          console.log('Service Worker registration failed:', error);
+        });
+    });
+  }
+</script>
+
+
     <meta charset="UTF-8">
     <title>HUB Service Auto</title>
     <link rel="stylesheet" href="css/style.css">
@@ -192,9 +215,9 @@
 	<!-- PARTEA CU FOOTHER -->
 	
 	<footer class="hub-footer">
-    Hub Service Auto — v0.0.7 • made by Aza for Don CSN Auto
+    Hub Service Auto — v0.0.8 • made by Aza for Don CSN Auto
     <div class="footer-updates">
-        Ultimele update-uri: <span style="color:#b450ff;">add footer premium, grid optimizat, header neon mov</span>
+        Ultimele update-uri: <span style="color:#b450ff;">Implementare PWA</span>
     </div>
 </footer>
 
