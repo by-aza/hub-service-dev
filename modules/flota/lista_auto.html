@@ -28,7 +28,7 @@
           <p>Observații: ${m.obs}</p>
           <div class="butoane">
             <button onclick="modifica(${m.rowIndex})">✏️ Modifică</button>
-            <a href="${m.link}" target="_blank">📁 Acte</a>
+            <a href="${m.link || '#'}" target="_blank">📁 Acte</a>
           </div>
         `;
         container.appendChild(card);
