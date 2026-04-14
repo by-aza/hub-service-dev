@@ -186,7 +186,7 @@
   <!-- SCRIPT: PRELUARE DATE DIN URL + POPULARE FORM -->
   <script>
     const params = new URLSearchParams(window.location.search);
-    const row = params.get("row");
+    const row = Number(params.get("row"));
 
     async function incarca() {
         const r = await fetch("https://script.google.com/macros/s/AKfycbxdlYO9JcT6f0q6hHGUE1XREPL5f9AIpfHQ3hAQa8P9sYtr0S00ZGm_Sl9oMFIFyXPcwQ/exec");
