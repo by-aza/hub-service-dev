@@ -1,0 +1,262 @@
+
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <title>Modifică Vehicul</title>
+
+  <style>
+    :root {
+        --bg: #f5f5f5;
+        --bg-header: #ffffff;
+        --text-header: #1e293b;
+        --btn-bg: #e2e8f0;
+        --btn-text: #1e293b;
+        --card-bg: #ffffff;
+        --card-border: #ddd;
+    }
+
+    .dark {
+        --bg: #0f172a;
+        --bg-header: #1e293b;
+        --text-header: #f8fafc;
+        --btn-bg: #334155;
+        --btn-text: #f8fafc;
+        --card-bg: #1e293b;
+        --card-border: #475569;
+    }
+
+    body {
+        background: var(--bg);
+        color: var(--text-header);
+        margin: 0;
+        font-family: Segoe UI, sans-serif;
+    }
+
+    /* HEADER */
+    .hub-header {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background: var(--bg-header);
+        color: var(--text-header);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 18px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    .hub-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .hub-logo {
+        height: 32px;
+    }
+
+    .hub-title {
+        font-size: 20px;
+        font-weight: 600;
+    }
+
+    .hub-right {
+        display: flex;
+        gap: 10px;
+    }
+
+    .hub-btn {
+        background: var(--btn-bg);
+        color: var(--btn-text);
+        border: none;
+        padding: 8px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    /* FORMULAR */
+    .formular {
+        max-width: 500px;
+        margin: 25px auto;
+        background: var(--card-bg);
+        padding: 20px;
+        border-radius: 10px;
+        border: 2px solid var(--card-border);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .formular h2 {
+        margin-top: 0;
+        text-align: center;
+    }
+
+    label {
+        display: block;
+        margin-top: 12px;
+        font-weight: 600;
+    }
+
+    input, textarea {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        font-size: 15px;
+    }
+
+    textarea {
+        height: 80px;
+        resize: vertical;
+    }
+
+    .btn-save {
+        margin-top: 20px;
+        width: 100%;
+        padding: 12px;
+        background: #2B6CB0;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+	
+	.btn-delete {
+    margin-top: 10px;
+    width: 100%;
+    padding: 12px;
+    background: #c0392b;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+}
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header class="hub-header">
+      <div class="hub-left">
+          <img src="../../icons/96x96.png" class="hub-logo" alt="Logo">
+          <span class="hub-title">Modifică Vehicul</span>
+      </div>
+
+      <div class="hub-right">
+          <button class="hub-btn" onclick="location.href='lista_auto.html'">⟵ Înapoi la listă</button>
+          <button class="hub-btn" id="themeToggle">🌙</button>
+      </div>
+  </header>
+
+  <!-- FORMULAR -->
+  <div class="formular">
+      <h2>Editează datele vehiculului</h2>
+
+      <label>Număr înmatriculare</label>
+      <input id="nr" type="text">
+
+      <label>VIN</label>
+      <input id="vin" type="text">
+
+      <label>Marca vehicul</label>
+      <input id="marca" type="text">
+
+      <label>Data expirare ITP</label>
+      <input id="itp" type="date">
+
+      <label>Data expirare RCA</label>
+      <input id="rca" type="date">
+
+      <label>Data expirare Rovinietă</label>
+      <input id="rov" type="date">
+
+      <label>Observații</label>
+      <textarea id="obs"></textarea>
+
+      <button class="btn-save" onclick="salveaza()">💾 Salvează modificările</button>
+	  <button class="btn-delete" onclick="sterge()">🗑️ Șterge vehicul</button>
+  </div>
+
+  <!-- SCRIPT: PRELUARE DATE DIN URL + POPULARE FORM -->
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const row = params.get("row");
+
+    async function incarca() {
+        const r = await fetch("https://script.google.com/macros/s/AKfycbxdlYO9JcT6f0q6hHGUE1XREPL5f9AIpfHQ3hAQa8P9sYtr0S00ZGm_Sl9oMFIFyXPcwQ/exec");
+        const masini = await r.json();
+        const m = masini.find(x => x.rowIndex == row);
+
+        document.getElementById("nr").value = m.nr;
+        document.getElementById("vin").value = m.vin;
+        document.getElementById("marca").value = m.marca;
+        document.getElementById("itp").value = m.itp_data;
+        document.getElementById("rca").value = m.rca_data;
+        document.getElementById("rov").value = m.rovinieta_data;
+        document.getElementById("obs").value = m.obs;
+    }
+
+    incarca();
+  </script>
+
+  <!-- SCRIPT: SALVARE -->
+  <script>
+    async function salveaza() {
+        const data = {
+            row: row,
+            nr: document.getElementById("nr").value,
+            vin: document.getElementById("vin").value,
+            marca: document.getElementById("marca").value,
+            itp: document.getElementById("itp").value,
+            rca: document.getElementById("rca").value,
+            rov: document.getElementById("rov").value,
+            obs: document.getElementById("obs").value
+        };
+
+        await fetch(
+            "https://script.google.com/macros/s/AKfycbxdlYO9JcT6f0q6hHGUE1XREPL5f9AIpfHQ3hAQa8P9sYtr0S00ZGm_Sl9oMFIFyXPcwQ/exec",
+            {
+                method: "POST",
+                body: JSON.stringify(data)
+            }
+        );
+
+        alert("Modificările au fost salvate");
+        window.location.href = "lista_auto.html";
+    }
+	
+	async function sterge() {
+    if (!confirm("Sigur vrei să ștergi acest vehicul?")) return;
+
+    await fetch(
+        "https://script.google.com/macros/s/AKfycbxdlYO9JcT6f0q6hHGUE1XREPL5f9AIpfHQ3hAQa8P9sYtr0S00ZGm_Sl9oMFIFyXPcwQ/exec",
+        {
+            method: "POST",
+            body: JSON.stringify({
+                delete: true,
+                row: row
+            })
+        }
+    );
+
+    alert("Vehiculul a fost șters.");
+    window.location.href = "lista_auto.html";
+}
+	
+  </script>
+
+  <!-- DARK/LIGHT -->
+  <script>
+    document.getElementById("themeToggle").onclick = () => {
+        document.body.classList.toggle("dark");
+    };
+  </script>
+
+</body>
+</html>
