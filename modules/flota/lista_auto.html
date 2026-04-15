@@ -264,25 +264,27 @@
 }
 
 /* ===========================
-   CARDURI GLASS NEON
+   CARDURI GLASS NEON – HIGH VISIBILITY
 =========================== */
+
+/* LIGHT MODE – fundal mai opac pentru lizibilitate */
 .card {
-    background: rgba(255, 255, 255, 0.18);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
+    background: rgba(255, 255, 255, 0.75); /* mai opac → text clar */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border-radius: 14px;
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.20);
     transition: 0.25s ease;
 }
 
-/* Dark mode glass */
+/* DARK MODE – păstrăm efectul glass transparent */
 .dark .card {
-    background: rgba(30, 41, 59, 0.25);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(30, 41, 59, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-/* Hover neon pulse */
+/* Hover */
 .card:hover {
     transform: translateY(-4px);
     box-shadow: 0 0 18px rgba(255,255,255,0.25);
