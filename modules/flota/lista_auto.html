@@ -178,15 +178,17 @@ async function incarcaMasini() {
     const card = document.createElement("div");
     card.className = "card";
 
-    // Zile rămase
-    const itp = m.zile_itp ?? "-";
-    const rca = m.zile_rca ?? "-";
-    const rov = m.zile_rov ?? "-";
+    // Convertim valorile goale în "-"
+    const itp = (m.zile_itp === "" || m.zile_itp === null) ? "-" : m.zile_itp;
+    const rca = (m.zile_rca === "" || m.zile_rca === null) ? "-" : m.zile_rca;
+    const rov = (m.zile_rov === "" || m.zile_rov === null) ? "-" : m.zile_rov;
 
     // Culoare card
-    const culoare =
-      itp <= 0 || rca <= 0 || rov <= 0 ? "rosu" :
-      (itp <= 30 || rca <= 30 || rov <= 30 ? "galben" : "verde");
+    const valori = [itp, rca, rov].map(v => parseInt(v, 10));
+
+    let culoare = "verde";
+    if (valori.some(v => !isNaN(v) && v <= 0)) culoare = "rosu";
+    else if (valori.some(v => !isNaN(v) && v <= 30)) culoare = "galben";
 
     card.classList.add(culoare);
 
