@@ -292,7 +292,9 @@
   ============================ -->
   <script>
 async function incarcaMasini() {
-  const raspuns = await fetch("https://script.google.com/macros/s/AKfycby44VeJwAhO5SDklVUyGB5otT0QBpue_vtfWyFScs5uelDlvIwkbJm6t6nZB1CjDOlW5A/exec");
+  const raspuns = await fetch(
+    "https://script.google.com/macros/s/AKfycby44VeJwAhO5SDklVUyGB5otT0QBpue_vtfWyFScs5uelDlvIwkbJm6t6nZB1CjDOlW5A/exec"
+  );
   const masini = await raspuns.json();
   const container = document.getElementById("lista");
 
@@ -300,41 +302,44 @@ async function incarcaMasini() {
     const card = document.createElement("div");
     card.className = "card";
 
-    // Convertim corect valorile
-    function normalize(val) {
-  if (val === null || val === undefined) return "-";
+    // ===========================
+    // CALCUL ZILE RAMASE DIRECT ÎN HTML
+    // ===========================
+    function zileRamase(data) {
+      if (!data || data.trim() === "") return "-";
 
-  // Convertim în string
-  val = String(val);
+      const azi = new Date();
+      const expira = new Date(data);
 
-  // Eliminăm TOATE spațiile, inclusiv cele invizibile
-  val = val.replace(/[\s\u00A0]+/g, "");
+      if (isNaN(expira.getTime())) return "-";
 
-  // Dacă e gol → "-"
-  if (val === "") return "-";
+      const diff = Math.floor((expira - azi) / (1000 * 60 * 60 * 24));
+      return diff;
+    }
 
-  // Dacă e număr valid → întoarcem număr
-  const nr = Number(val);
-  if (!isNaN(nr)) return nr;
+    const itp = zileRamase(m.itp);            // F
+    const rca = zileRamase(m.rca);            // D
+    const rov = zileRamase(m.rovinieta);      // H
 
-  return "-";
-}
-
-    const itp = zileRamase(m.itp);
-const rca = zileRamase(m.rca);
-const rov = zileRamase(m.rovinieta);
-
-    // Culoare card
+    // ===========================
+    // CULOARE CARD
+    // ===========================
     const valori = [itp, rca, rov].filter(v => typeof v === "number");
 
-let culoare = "verde";
-if (valori.some(v => v <= 0)) culoare = "rosu";
-else if (valori.some(v => v <= 30)) culoare = "galben";
+    let culoare = "verde";
+    if (valori.some(v => v <= 0)) culoare = "rosu";
+    else if (valori.some(v => v <= 30)) culoare = "galben";
 
     card.classList.add(culoare);
 
+    // ===========================
+    // LINK ACTE
+    // ===========================
     const linkActe = m.link && m.link.startsWith("http") ? m.link : "#";
 
+    // ===========================
+    // HTML CARD
+    // ===========================
     card.innerHTML = `
       <div class="nr">${m.nr}</div>
       <div class="vin">VIN: ${m.vin}</div>
@@ -364,19 +369,6 @@ function veziActe(link) {
 }
 
 window.onload = incarcaMasini;
-
-function zileRamase(data) {
-  if (!data || data.trim() === "") return "-";
-
-  const azi = new Date();
-  const expira = new Date(data);
-
-  if (isNaN(expira.getTime())) return "-";
-
-  const diff = Math.floor((expira - azi) / (1000 * 60 * 60 * 24));
-  return diff;
-}
-
 </script>
 
 
