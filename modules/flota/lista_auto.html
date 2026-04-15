@@ -191,9 +191,9 @@
         card.innerHTML = `
           <h2>${m.nr}</h2>
           <p class="vin">VIN: ${m.vin}</p>
-          <p class="${culoare}">ITP: ${itp} zile</p>
-          <p class="${culoare}">RCA: ${rca} zile</p>
-          <p class="${culoare}">Rovinietă: ${rov} zile</p>
+          <p class="${culoare}">ITP: ${masina.zile_itp} zile</p>
+          <p class="${culoare}">RCA: ${masina.zile_rca} zile</p>
+          <p class="${culoare}">Rovinieta: ${masina.zile_rov} zile</p>
           <p>Observații: ${m.obs || "-"}</p>
 
           <div class="butoane">
