@@ -221,24 +221,31 @@ header::after {
    NOTE 8 — RESPONSIVE BREAKPOINTS
    ============================================================ */
 
+/* 1600px — reorganizare mai devreme */
+@media (max-width: 1600px) {
+    .hub-container {
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    }
+}
+
 /* 1400px – reorganizare mai devreme */
 @media (max-width: 1400px) {
     .hub-container {
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     }
 }
 
 /* 1200px – trece pe 2 coloane */
 @media (max-width: 1200px) {
     .hub-container {
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
 /* 1024px – tabletă landscape */
 @media (max-width: 1024px) {
     .hub-container {
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        grid-template-columns: repeat(2, 1fr);
         gap: var(--space-m);
     }
 
@@ -250,7 +257,7 @@ header::after {
 /* 900px – ajustare suplimentară */
 @media (max-width: 900px) {
     .hub-container {
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
