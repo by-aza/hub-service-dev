@@ -308,6 +308,37 @@
     box-shadow: 0 6px 18px rgba(0,0,0,0.45);
 }
 
+/* TEXT MAI MARE ȘI MAI LIZIBIL */
+.card .nr {
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+
+.card .vin {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.card .linie {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin: 6px 0;
+}
+
+.card .linie b {
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.card .obs {
+    font-size: 1.2rem;
+    margin-top: 10px;
+}
+
+.card button {
+    font-size: 1.1rem;
+    font-weight: 600;
+
   </style>
 </head>
 
@@ -407,7 +438,7 @@ async function incarcaMasini() {
 }
 
 function modifica(rowIndex) {
-  window.location.href = `modifica.html?row=${rowIndex}`;
+  return; // nu face nimic
 }
 
 function veziActe(link) {
