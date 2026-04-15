@@ -234,6 +234,18 @@ header::after {
 }
 
 
+@media (max-width: 600px) {
+    .hub-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hub-card {
+        font-size: 0.95rem;
+        padding: 12px;
+    }
+}
+
+
 /* ============================================================
    NOTE 12 — RESPONSIVE: BREAKPOINT 480px (MOBIL)
    ============================================================ */
@@ -628,15 +640,22 @@ body.dark-mode {
 /* GRID pentru carduri */
 .hub-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     padding: 20px;
 }
+
+/* CARDURI responsive */
 .hub-card {
     padding: 15px;
     text-align: center;
     font-size: 1.1rem;
     font-weight: 600;
+
+    /* IMPORTANT pentru responsive */
+    min-height: 120px;
+    height: auto;
+    box-sizing: border-box;
 }
 
 /* CARD MODERN – DESIGN DE BAZĂ */
