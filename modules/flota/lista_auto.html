@@ -300,35 +300,36 @@ async function incarcaMasini() {
     const card = document.createElement("div");
     card.className = "card";
 
-    // Convertim valorile goale în "-"
-    const itp = (m.zile_itp === "" || m.zile_itp === null) ? "-" : m.zile_itp;
-    const rca = (m.zile_rca === "" || m.zile_rca === null) ? "-" : m.zile_rca;
-    const rov = (m.zile_rov === "" || m.zile_rov === null) ? "-" : m.zile_rov;
+    // Normalizează valorile
+    const itp = (m.zile_itp === "" || m.zile_itp === null || m.zile_itp === undefined) ? "-" : m.zile_itp;
+    const rca = (m.zile_rca === "" || m.zile_rca === null || m.zile_rca === undefined) ? "-" : m.zile_rca;
+    const rov = (m.zile_rov === "" || m.zile_rov === null || m.zile_rov === undefined) ? "-" : m.zile_rov;
 
     // Culoare card
     const valori = [itp, rca, rov].map(v => parseInt(v, 10));
-
     let culoare = "verde";
+
     if (valori.some(v => !isNaN(v) && v <= 0)) culoare = "rosu";
     else if (valori.some(v => !isNaN(v) && v <= 30)) culoare = "galben";
 
     card.classList.add(culoare);
 
-    // Link acte
     const linkActe = m.link && m.link.startsWith("http") ? m.link : "#";
 
     card.innerHTML = `
       <div class="nr">${m.nr}</div>
       <div class="vin">VIN: ${m.vin}</div>
 
-      <div class="itp">ITP: <b>${itp}</b> zile</div>
-      <div class="rca">RCA: <b>${rca}</b> zile</div>
-      <div class="rov">Rovinietă: <b>${rov}</b> zile</div>
+      <div class="linie"><span>ITP:</span> <b>${itp}</b> zile</div>
+      <div class="linie"><span>RCA:</span> <b>${rca}</b> zile</div>
+      <div class="linie"><span>Rovinietă:</span> <b>${rov}</b> zile</div>
 
       <div class="obs">Observații: ${m.obs || "-"}</div>
 
-      <button onclick="modifica('${m.rowIndex}')">✏️ Modifică</button>
-      <button onclick="veziActe('${linkActe}')">📁 Acte</button>
+      <div class="butoane">
+        <button onclick="modifica('${m.rowIndex}')">✏️ Modifică</button>
+        <button onclick="veziActe('${linkActe}')">📁 Acte</button>
+      </div>
     `;
 
     container.appendChild(card);
