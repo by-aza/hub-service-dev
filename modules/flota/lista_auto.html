@@ -302,15 +302,25 @@ async function incarcaMasini() {
 
     // Convertim corect valorile
     function normalize(val) {
-      if (val === "" || val === null || val === undefined) return "-";
-      if (typeof val === "string" && val.trim() === "") return "-";
-      if (!isNaN(Number(val))) return Number(val);
-      return "-";
-    }
+  if (val === null || val === undefined) return "-";
+
+  // Convertim în string ca să putem curăța
+  val = String(val).trim();
+
+  // Dacă e gol după trim → "-"
+  if (val === "") return "-";
+
+  // Dacă e număr valid → întoarcem număr
+  const nr = Number(val);
+  if (!isNaN(nr)) return nr;
+
+  // Orice altceva → "-"
+  return "-";
+}
 
     const itp = normalize(m.zile_itp);
-    const rca = normalize(m.zile_rca);
-    const rov = normalize(m.zile_rov);
+const rca = normalize(m.zile_rca);
+const rov = normalize(m.zile_rov);
 
     // Culoare card
     const valori = [itp, rca, rov].filter(v => typeof v === "number");
