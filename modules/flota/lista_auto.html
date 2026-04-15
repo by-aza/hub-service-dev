@@ -320,16 +320,16 @@ async function incarcaMasini() {
   return "-";
 }
 
-    const itp = normalize(m.zile_itp);
-const rca = normalize(m.zile_rca);
-const rov = normalize(m.zile_rov);
+    const itp = zileRamase(m.itp);
+const rca = zileRamase(m.rca);
+const rov = zileRamase(m.rovinieta);
 
     // Culoare card
     const valori = [itp, rca, rov].filter(v => typeof v === "number");
 
-    let culoare = "verde";
-    if (valori.some(v => v <= 0)) culoare = "rosu";
-    else if (valori.some(v => v <= 30)) culoare = "galben";
+let culoare = "verde";
+if (valori.some(v => v <= 0)) culoare = "rosu";
+else if (valori.some(v => v <= 30)) culoare = "galben";
 
     card.classList.add(culoare);
 
@@ -364,6 +364,19 @@ function veziActe(link) {
 }
 
 window.onload = incarcaMasini;
+
+function zileRamase(data) {
+  if (!data || data.trim() === "") return "-";
+
+  const azi = new Date();
+  const expira = new Date(data);
+
+  if (isNaN(expira.getTime())) return "-";
+
+  const diff = Math.floor((expira - azi) / (1000 * 60 * 60 * 24));
+  return diff;
+}
+
 </script>
 
 
