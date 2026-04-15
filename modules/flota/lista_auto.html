@@ -189,18 +189,18 @@
         const linkActe = m.link && m.link.startsWith("http") ? m.link : "#";
 
         card.innerHTML = `
-          <h2>${m.nr}</h2>
-          <p class="vin">VIN: ${m.vin}</p>
-          <p class="${culoare}">ITP: ${masina.zile_itp} zile</p>
-          <p class="${culoare}">RCA: ${masina.zile_rca} zile</p>
-          <p class="${culoare}">Rovinieta: ${masina.zile_rov} zile</p>
-          <p>Observații: ${m.obs || "-"}</p>
+  <div class="nr">${masina.nr}</div>
+  <div class="vin">VIN: ${masina.vin}</div>
 
-          <div class="butoane">
-            <button onclick="modifica(${m.rowIndex})">✏️ Modifică</button>
-            <a href="${linkActe}" target="_blank">📁 Acte</a>
-          </div>
-        `;
+  <div class="itp">ITP: ${masina.zile_itp} zile</div>
+  <div class="rca">RCA: ${masina.zile_rca} zile</div>
+  <div class="rov">Rovinietă: ${masina.zile_rov} zile</div>
+
+  <div class="obs">Observații: ${masina.obs || "-"}</div>
+
+  <button onclick="modifica('${masina.rowIndex}')">✏️ Modifică</button>
+  <button onclick="veziActe('${masina.link}')">📁 Acte</button>
+`;
 
         container.appendChild(card);
       });
