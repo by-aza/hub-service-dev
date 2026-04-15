@@ -178,9 +178,9 @@
         const card = document.createElement("div");
         card.className = "card";
 
-        const itp = m.itp || "-";
-		const rca = m.rca || "-";
-		const rov = m.rovinieta || "-";
+        const itp = m.zile_itp || "-";
+		const rca = m.zile_rca || "-";
+		const rov = m.zile_rov || "-";
 
         const culoare =
             itp <= 0 || rca <= 0 || rov <= 0 ? "rosu" :
@@ -189,17 +189,17 @@
         const linkActe = m.link && m.link.startsWith("http") ? m.link : "#";
 
         card.innerHTML = `
-  <div class="nr">${masina.nr}</div>
-  <div class="vin">VIN: ${masina.vin}</div>
+  <div class="nr">${m.nr}</div>
+  <div class="vin">VIN: ${m.vin}</div>
 
-  <div class="itp">ITP: ${masina.zile_itp} zile</div>
-  <div class="rca">RCA: ${masina.zile_rca} zile</div>
-  <div class="rov">Rovinietă: ${masina.zile_rov} zile</div>
+  <div class="itp">ITP: ${m.zile_itp} zile</div>
+  <div class="rca">RCA: ${m.zile_rca} zile</div>
+  <div class="rov">Rovinietă: ${m.zile_rov} zile</div>
 
-  <div class="obs">Observații: ${masina.obs || "-"}</div>
+  <div class="obs">Observații: ${m.obs || "-"}</div>
 
-  <button onclick="modifica('${masina.rowIndex}')">✏️ Modifică</button>
-  <button onclick="veziActe('${masina.link}')">📁 Acte</button>
+  <button onclick="modifica('${m.rowIndex}')">✏️ Modifică</button>
+  <button onclick="veziActe('${m.link}')">📁 Acte</button>
 `;
 
         container.appendChild(card);
