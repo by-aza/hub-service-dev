@@ -262,6 +262,46 @@
 .rosu {
     border-left: 8px solid #ef4444;
 }
+
+/* ===========================
+   CARDURI GLASS EFFECT
+=========================== */
+.card {
+    background: rgba(255, 255, 255, 0.35); /* transparență */
+    backdrop-filter: blur(10px);           /* blur sticlă */
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition: 0.25s ease;
+}
+
+.dark .card {
+    background: rgba(30, 41, 59, 0.45); /* sticlă în dark mode */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Hover mai elegant */
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+}
+
+/* ===========================
+   ACCENTE CULOARE
+=========================== */
+.verde {
+    border-left: 8px solid #16a34a; /* verde saturat */
+}
+
+.galben {
+    border-left: 8px solid #eab308;
+}
+
+.rosu {
+    border-left: 8px solid #ef4444;
+}
+
   </style>
 </head>
 
