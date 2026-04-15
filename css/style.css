@@ -221,6 +221,20 @@ header::after {
    NOTE 8 — RESPONSIVE BREAKPOINTS
    ============================================================ */
 
+/* 1400px – reorganizare mai devreme */
+@media (max-width: 1400px) {
+    .hub-container {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+}
+
+/* 1200px – trece pe 2 coloane */
+@media (max-width: 1200px) {
+    .hub-container {
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    }
+}
+
 /* 1024px – tabletă landscape */
 @media (max-width: 1024px) {
     .hub-container {
@@ -257,6 +271,13 @@ header::after {
 
     .hub-label {
         font-size: 15px;
+    }
+}
+
+/* 600px – 1 coloană */
+@media (max-width: 600px) {
+    .hub-container {
+        grid-template-columns: 1fr;
     }
 }
 
