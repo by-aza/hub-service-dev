@@ -470,19 +470,12 @@
   const CSV_URL =
     "https://docs.google.com/spreadsheets/d/e/2PACX-1vR7mX8RLv-YJ8OU0zCF3Kt6khLDosTW5wAZJ6Ba83Xd8U24gNqXIupTdwJl_j3tftiOdfAqo2E1cPeL/pub?gid=906891078&single=true&output=csv";
 
-  /* Variabile interne */
   let allProducts = [];
   let currentFilter = "all";
   let currentSearch = "";
 
   /* ============================================================
-     NOTE 2 — PARSARE CSV
-     Aici se mapează coloanele din tabul STOC:
-     A = Cod Produs
-     B = Denumire
-     C = Total IN
-     D = Total OUT
-     E = Stoc Actual
+     NOTE 2 — PARSARE CSV (ACUM INCLUDE ȘI PRAG MINIM)
      ============================================================ */
   function parseCSV(text) {
     const lines = text.trim().split(/\r?\n/);
@@ -495,40 +488,42 @@
 
     const header = rows.shift() || [];
 
-    const idxCode = header.findIndex((h) =>
-      h.toLowerCase().includes("cod")
-    );
-    const idxName = header.findIndex((h) =>
-      h.toLowerCase().includes("denum")
-    );
-    const idxStock = header.findIndex((h) =>
-      h.toLowerCase().includes("stoc")
-    );
+    const idxCode = header.findIndex((h) => h.toLowerCase().includes("cod"));
+    const idxName = header.findIndex((h) => h.toLowerCase().includes("denum"));
+    const idxStock = header.findIndex((h) => h.toLowerCase().includes("stoc"));
+    const idxPrag = header.findIndex((h) => h.toLowerCase().includes("prag"));
 
     return rows
       .map((cols) => {
         const code = cols[idxCode] || "";
         const name = cols[idxName] || "";
         const stock = Number((cols[idxStock] || "0").replace(",", ".")) || 0;
-        return { code, name, stock };
+        const prag = Number((cols[idxPrag] || "").replace(",", ".")) || null;
+
+        return { code, name, stock, prag };
       })
       .filter((p) => p.name || p.code);
   }
 
   /* ============================================================
-     NOTE 3 — LOGICĂ STATUS
-     OUT = stoc 0
-     OK  = stoc > 0
-     LOW = îl activăm când introduci un prag minim în sheet
+     NOTE 3 — LOGICĂ STATUS (OK / LOW / OUT)
      ============================================================ */
   function computeStatus(product) {
-    if (product.stock <= 0) return "out";
+    const stock = product.stock;
+    const prag = product.prag;
+
+    if (stock <= 0) return "out";
+
+    // dacă pragul nu este setat → produsul este OK
+    if (prag === null || isNaN(prag)) return "ok";
+
+    if (stock > 0 && stock <= prag) return "low";
+
     return "ok";
   }
 
   /* ============================================================
      NOTE 4 — RENDER LISTĂ PRODUSE
-     Aici controlezi cum arată fiecare produs în listă.
      ============================================================ */
   function render() {
     const listEl = document.getElementById("product-list");
@@ -583,10 +578,11 @@
           </div>
 
           <div class="prod-right">
-            <span class="pill-small">
-              <span class="dot"></span>
-              vizualizare rapidă
-            </span>
+            ${
+              p.prag !== null
+                ? `<span class="pill-small">Prag: ${p.prag}</span>`
+                : `<span class="pill-small" style="opacity:0.4;">Fără prag</span>`
+            }
           </div>
         `;
 
@@ -598,23 +594,25 @@
   }
 
   /* ============================================================
-     NOTE 5 — DASHBOARD (cardurile OK / OUT / TOTAL)
+     NOTE 5 — DASHBOARD (OK / LOW / OUT / TOTAL)
      ============================================================ */
   function updateDashboard() {
     const total = allProducts.length;
     let ok = 0;
+    let low = 0;
     let out = 0;
 
     allProducts.forEach((p) => {
       const status = computeStatus(p);
       if (status === "ok") ok++;
+      if (status === "low") low++;
       if (status === "out") out++;
     });
 
     document.getElementById("count-total").textContent = total;
     document.getElementById("count-ok").textContent = ok;
+    document.getElementById("count-low").textContent = low;
     document.getElementById("count-out").textContent = out;
-    document.getElementById("count-low").textContent = 0; // LOW vine mai târziu
   }
 
   /* ============================================================
@@ -645,12 +643,11 @@
   }
 
   /* ============================================================
-     NOTE 7 — ÎNCĂRCARE DATE DIN GOOGLE SHEETS
+     NOTE 7 — ÎNCĂRCARE DATE
      ============================================================ */
   async function loadData() {
     try {
       const res = await fetch(CSV_URL);
-
       if (!res.ok) throw new Error("HTTP " + res.status);
 
       const text = await res.text();
@@ -665,9 +662,6 @@
     }
   }
 
-  /* ============================================================
-     NOTE 8 — START
-     ============================================================ */
   initEvents();
   loadData();
 </script>
