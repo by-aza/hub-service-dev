@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telefoane Clienți</title>
+
+    <!-- NOTE: Stil identic cu Stocuri consumabile -->
+    <style>
+        body {
+            margin: 0;
+            background: radial-gradient(circle at top, #1f2937 0, #020617 45%, #000 100%);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            color: #e6edf3;
+        }
+
+        /* HEADER */
+        .hub-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 999;
+    padding: 15px 20px 10px 20px;
+    background: transparent; /* lasă gradientul body să se vadă */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* LOGO + TITLU */
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.header-logo {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+    padding: 4px;
+    
+    backdrop-filter: blur(6px);
+    transition: 0.25s ease;
+    box-shadow: 0 0 8px rgba(0,0,0,0.15);
+}
+.header-logo:hover {
+    transform: scale(1.03);
+    box-shadow: 0 0 14px rgba(0,0,0,0.25);
+}
+
+.header-title {
+    font-size: 30px;
+    font-weight: 700;
+}
+
+/* BUTON HUB */
+.hub-btn {
+    display: inline-block !important;
+    background: #8b5cf6 !important; /* Movul butonului */
+    color: white !important;
+    padding: 8px 14px !important;/* mai îngust */
+    border-radius: 8px !important;
+    border: 1px solid #8b5cf6;
+    cursor: pointer !important;
+    white-space: nowrap !important;
+    text-decoration: none;
+    font-size: 15px;
+    transition: 0.2s;
+    margin-right: 40px; /* îl aduce spre stânga */
+}
+
+.hub-btn:hover {
+    margin-left: auto !important; /* Aceasta îl trimite în colțul opus */
+    background: #8b5cf6 !important; /* Movul tău */
+    box-shadow: 0 0 12px rgba(139, 92, 246, 0.6);
+    transform: translateY(-1px);
+}
+
+/* LINIA MOV */
+.header-line {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: #b450ff;
+    box-shadow: 0 0 12px rgba(180, 80, 255, 0.7);
+}
+.page-content {
+    padding-top: 120px; /* ajustezi după înălțimea headerului tău */
+}
+
+        /* SEARCH BAR */
+        .search-container {
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .search-input {
+            flex: 1;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid #30363d;
+    background: #0f172a;
+    color: #e6edf3;
+    font-size: 15px;
+        }
+
+        .search-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px; /* spațiu între search și + */
+    margin: 20px auto;
+    width: 100%;
+    max-width: 600px; /* controlează lățimea totală */
+}
+
+        .add-btn {
+            background: #22c55e;
+    color: white;
+    padding: 15px 10px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 28px; /* + mai mare */
+    font-weight: 700;
+    border: 1px solid #16a34a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 0;
+    transition: 0.2s;
+        }
+
+        .add-btn:hover {
+    background: #16a34a;
+}
+
+        /* LIST ROWS */
+        .row {
+            background-color: #161b22;
+            margin: 10px 15px;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+        }
+
+        .row-item {
+            margin-bottom: 6px;
+        }
+
+        .label {
+            font-size: 12px;
+            color: #8b949e;
+        }
+
+        .value {
+            font-size: 16px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header class="hub-header">
+    <div class="header-left">
+        <img src="../../icons/logo.png" alt="Logo" class="header-logo">
+        <span class="header-title">Telefoane Clienți</span>
+    </div>
+
+    <a href="index.html" class="hub-btn">← Înapoi la HUB</a>
+
+    <div class="header-line"></div>
+</header>
+
+    <!-- SEARCH + ADD -->
+     <div class="page-content">
+
+    <div class="search-wrapper">
+        <input type="text" id="searchInput" class="search-input"
+               placeholder="Caută client, observații sau telefon...">
+
+        <a href="#" class="add-btn">+</a>
+    </div>
+
+</div>
+
+    <!-- LISTA -->
+    <div id="listContainer"></div>
+
+    <script>
+        // NOTE: CSV publicat la web
+        const CSV_URL = "YOUR_CSV_LINK_HERE";
+
+        async function loadData() {
+            const response = await fetch(CSV_URL);
+            const text = await response.text();
+
+            const rows = text.split("\n").slice(1); // skip header
+
+            const data = rows.map(r => {
+                const cols = r.split(",");
+                return {
+                    client: cols[0]?.trim(),
+                    obs: cols[1]?.trim(),
+                    tel: cols[2]?.trim()
+                };
+            });
+
+            renderList(data);
+
+            document.getElementById("searchInput").addEventListener("input", () => {
+                const q = document.getElementById("searchInput").value.toLowerCase();
+                const filtered = data.filter(item =>
+                    item.client.toLowerCase().includes(q) ||
+                    item.obs.toLowerCase().includes(q) ||
+                    item.tel.toLowerCase().includes(q)
+                );
+                renderList(filtered);
+            });
+        }
+
+        function renderList(items) {
+            const container = document.getElementById("listContainer");
+            container.innerHTML = "";
+
+            items.forEach(item => {
+                const row = document.createElement("div");
+                row.className = "row";
+
+                row.innerHTML = `
+                    <div class="row-item">
+                        <div class="label">Client</div>
+                        <div class="value">${item.client}</div>
+                    </div>
+
+                    <div class="row-item">
+                        <div class="label">Observații</div>
+                        <div class="value">${item.obs}</div>
+                    </div>
+
+                    <div class="row-item">
+                        <div class="label">Telefon</div>
+                        <div class="value">${item.tel}</div>
+                    </div>
+                `;
+
+                container.appendChild(row);
+            });
+        }
+
+        loadData();
+    </script>
+
+</body>
+</html>
