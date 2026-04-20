@@ -7,6 +7,13 @@
 
     <!-- NOTE: Stil identic cu Stocuri consumabile -->
     <style>
+
+    :root {
+    --col-client: 1.4fr;   /* nume / firmă / model */
+    --col-obs: 3fr;        /* probleme, detalii */
+    --col-tel: 0.7fr;      /* doar nr. de telefon */
+}
+    
         body {
             margin: 0;
             background: radial-gradient(circle at top, #1f2937 0, #020617 45%, #000 100%);
@@ -163,6 +170,53 @@
             font-size: 16px;
             font-weight: bold;
         }
+
+/* CAP TABEL FIX */
+.table-head {
+    position: sticky;
+    top: 120px; /* EXACT sub headerul tău */
+    z-index: 50;
+    display: grid;
+    grid-template-columns: var(--col-client) var(--col-obs) var(--col-tel);
+    background: rgba(0, 0, 0, 0.35); /* discret, se vede gradientul */
+    backdrop-filter: blur(4px);
+    padding: 10px 15px;
+    border-bottom: 1px solid #30363d;
+}
+
+/* TEXT COLOANE */
+.th-col {
+    font-size: 14px;
+    font-weight: 600;
+    color: #e879f9; /* movul tău din screenshot */
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* RÂND (CASETĂ) */
+.row-item {
+    display: grid;
+    grid-template-columns: var(--col-client) var(--col-obs) var(--col-tel);
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 12px 15px;
+    margin: 10px 15px;
+    gap: 10px;
+}
+
+    /* TEXT DIN CASETA) */
+.cell {
+    font-size: 15px;
+    color: #e6edf3;
+    overflow-wrap: break-word; /* textul nu iese din coloană */
+}
+     /* LINII VERTICALE DISCRETE) */   
+.cell:not(:last-child) {
+    border-right: 1px solid #2a2f3a;
+    padding-right: 10px;
+}
+
     </style>
 </head>
 
@@ -175,13 +229,13 @@
         <span class="header-title">Telefoane Clienți</span>
     </div>
 
-    <a href="index.html" class="hub-btn">← Înapoi la HUB</a>
+    <a href="../../index.html" class="hub-btn">← Înapoi la HUB</a>
 
     <div class="header-line"></div>
 </header>
 
     <!-- SEARCH + ADD -->
-     <div class="page-content">
+    <div class="page-content">
 
     <div class="search-wrapper">
         <input type="text" id="searchInput" class="search-input"
@@ -190,71 +244,69 @@
         <a href="#" class="add-btn">+</a>
     </div>
 
-</div>
-
+        <!-- CAP TABEL -->
+    <div class="table-head">
+    <div class="th-col">CLIENT</div>
+    <div class="th-col">OBSERVAȚII</div>
+    <div class="th-col">TELEFON</div>
+    </div>
     <!-- LISTA -->
     <div id="listContainer"></div>
 
+    </div>
+  
     <script>
         // NOTE: CSV publicat la web
-        const CSV_URL = "YOUR_CSV_LINK_HERE";
+        const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTOaXJgNXR11ALucAYLpkwN3OASmTEci_-K8MUVgh6I1-lt63eyE64oU3Oe6OLzqrf_kC_9yKQPC_Ej/pub?gid=0&single=true&output=csv";
 
-        async function loadData() {
-            const response = await fetch(CSV_URL);
-            const text = await response.text();
+       async function loadData() {
+    const response = await fetch(CSV_URL + "&v=" + Date.now());
 
-            const rows = text.split("\n").slice(1); // skip header
+    const text = await response.text();
 
-            const data = rows.map(r => {
-                const cols = r.split(",");
-                return {
-                    client: cols[0]?.trim(),
-                    obs: cols[1]?.trim(),
-                    tel: cols[2]?.trim()
-                };
-            });
+    const rows = text.split("\n").slice(1); // skip header
 
-            renderList(data);
+    const data = rows.map(r => {
+        const cols = r.split(",");
+        return {
+            client: cols[0]?.trim(),
+            obs: cols[1]?.trim(),
+            tel: cols[2]?.trim()
+        };
+    });
 
-            document.getElementById("searchInput").addEventListener("input", () => {
-                const q = document.getElementById("searchInput").value.toLowerCase();
-                const filtered = data.filter(item =>
-                    item.client.toLowerCase().includes(q) ||
-                    item.obs.toLowerCase().includes(q) ||
-                    item.tel.toLowerCase().includes(q)
-                );
-                renderList(filtered);
-            });
-        }
+    renderList(data);
 
-        function renderList(items) {
-            const container = document.getElementById("listContainer");
-            container.innerHTML = "";
+    document.getElementById("searchInput").addEventListener("input", () => {
+        const q = document.getElementById("searchInput").value.toLowerCase();
+        const filtered = data.filter(item =>
+            item.client.toLowerCase().includes(q) ||
+            item.obs.toLowerCase().includes(q) ||
+            item.tel.toLowerCase().includes(q)
+        );
+        renderList(filtered);
+    });
+}
 
-            items.forEach(item => {
-                const row = document.createElement("div");
-                row.className = "row";
 
-                row.innerHTML = `
-                    <div class="row-item">
-                        <div class="label">Client</div>
-                        <div class="value">${item.client}</div>
-                    </div>
+       function renderList(items) {
+    const container = document.getElementById("listContainer");
+    container.innerHTML = "";
 
-                    <div class="row-item">
-                        <div class="label">Observații</div>
-                        <div class="value">${item.obs}</div>
-                    </div>
+    items.forEach(item => {
+        const row = document.createElement("div");
+        row.className = "row-item";
 
-                    <div class="row-item">
-                        <div class="label">Telefon</div>
-                        <div class="value">${item.tel}</div>
-                    </div>
-                `;
+        row.innerHTML = `
+            <div class="cell client">${item.client}</div>
+            <div class="cell obs">${item.obs}</div>
+            <div class="cell tel">${item.tel}</div>
+        `;
 
-                container.appendChild(row);
-            });
-        }
+        container.appendChild(row);
+    });
+}
+
 
         loadData();
     </script>
