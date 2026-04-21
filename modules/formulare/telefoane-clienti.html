@@ -21,6 +21,24 @@
             color: #e6edf3;
         }
 
+        /* SETARI CASETE - VARIANTA COMPACTA */
+        .container {
+    max-width: 1080px;
+    margin: 0 auto;
+}
+.page-wrapper {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding-top: 0px; /* spațiu sub header */
+}
+#listContainer {
+    max-height: calc(100vh - 240px); 
+    overflow-y: auto;
+    margin-top: 10px;
+    padding-right: 5px; /* ca să nu taie scrollbarul textul */
+}
+
+
         /* HEADER */
         .hub-header {
     position: fixed;
@@ -97,7 +115,9 @@
     box-shadow: 0 0 12px rgba(180, 80, 255, 0.7);
 }
 .page-content {
-    padding-top: 120px; /* ajustezi după înălțimea headerului tău */
+    padding-top: 90px; /* ajustezi după înălțimea headerului tău */
+    height: auto;      /* IMPORTANT */
+    overflow: visible; /* IMPORTANT */
 }
 
         /* SEARCH BAR */
@@ -119,11 +139,18 @@
         }
 
         .search-wrapper {
+     position: sticky; 
+     top: 120px; /* exact sub headerul tău */ 
+     z-index: 40;
+     backdrop-filter: blur(6px);
+     padding: 12px 0;
+     margin-bottom: 10px;
+     margin-left: auto;
+     margin-right: auto;     
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 10px; /* spațiu între search și + */
-    margin: 20px auto;
+    gap: 20px; /* spațiu între search și + */
     width: 100%;
     max-width: 600px; /* controlează lățimea totală */
 }
@@ -171,22 +198,35 @@
             font-weight: bold;
         }
 
-/* CAP TABEL FIX */
+/* CAP TABEL FIX - VARIANTA PREMIUM */
 .table-head {
     position: sticky;
-    top: 120px; /* EXACT sub headerul tău */
+    top: 170px; /* header (120px) + search (50px) */
     z-index: 50;
     display: grid;
     grid-template-columns: var(--col-client) var(--col-obs) var(--col-tel);
-    background: rgba(0, 0, 0, 0.35); /* discret, se vede gradientul */
-    backdrop-filter: blur(4px);
-    padding: 10px 15px;
-    border-bottom: 1px solid #30363d;
+    background: rgba(20, 16, 26, 0.08);
+    backdrop-filter: blur(6px);
+    padding: 12px 16px;
+    border-radius: 10px; /* colțuri rotunjite */
+    margin-bottom: 10px;
+    font-weight: 600;
+    text-align: center; /* text centrat */
+}
+.table-head .th-col:nth-child(3) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px; /* sau 20px, 22px, cât vrei */
+    transform: translateX(-30px); /* ajustezi 2–10px */
+}
+.cell.tel {
+    text-align: center;
 }
 
 /* TEXT COLOANE */
 .th-col {
-    font-size: 14px;
+    font-size: 24px;
     font-weight: 600;
     color: #e879f9; /* movul tău din screenshot */
     text-transform: uppercase;
@@ -228,13 +268,14 @@
         <img src="../../icons/logo.png" alt="Logo" class="header-logo">
         <span class="header-title">Telefoane Clienți</span>
     </div>
-
+    
     <a href="../../index.html" class="hub-btn">← Înapoi la HUB</a>
 
-    <div class="header-line"></div>
+    <div class="header-line">
 </header>
 
     <!-- SEARCH + ADD -->
+     <div class="page-wrapper">
     <div class="page-content">
 
     <div class="search-wrapper">
@@ -253,6 +294,7 @@
     <!-- LISTA -->
     <div id="listContainer"></div>
 
+    </div>
     </div>
   
     <script>
