@@ -307,7 +307,9 @@ header::after {
         width: 60px;
         height: 60px;
     }
+    
 }
+
 
 /* 480px – telefon mic */
 @media (max-width: 480px) {
