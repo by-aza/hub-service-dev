@@ -4,6 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Telefoane Clienți</title>
+    <link rel="manifest" href="../../manifest.json">
+    <meta name="theme-color" content="#0078d7">
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("../../sw.js").catch((error) => {
+            console.error("Service Worker registration failed:", error);
+          });
+        });
+      }
+    </script>
 
     <!-- NOTE: Stil identic cu Stocuri consumabile -->
     <style>
@@ -94,7 +105,7 @@
     text-decoration: none;
     font-size: 15px;
     transition: 0.2s;
-    margin-right: 40px; /* îl aduce spre stânga */
+    margin-right: 12px;
 }
 
 .hub-btn:hover {
@@ -231,6 +242,7 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
     text-align: center;
+    justify-self: center;
 }
 
 /* RÂND (CASETĂ) */
@@ -259,6 +271,78 @@
 .cell:not(:last-child) {
     border-right: 1px solid #2a2f3a;
     padding-right: 10px;
+}
+
+@media (max-width: 760px) {
+    :root {
+        --col-client: 1fr;
+        --col-obs: 1fr;
+        --col-tel: 1fr;
+    }
+
+    .hub-header {
+        padding: 10px 8px 8px 8px;
+        gap: 8px;
+    }
+
+    .header-left {
+        gap: 8px;
+        min-width: 0;
+    }
+
+    .header-logo {
+        width: 56px;
+        height: 56px;
+        padding: 2px;
+    }
+
+    .header-title {
+        font-size: 2rem;
+        line-height: 1.05;
+    }
+
+    .hub-btn {
+        margin-right: 0;
+        padding: 7px 10px !important;
+        font-size: 0.85rem;
+    }
+
+    .page-content {
+        padding-top: 80px;
+    }
+
+    .search-wrapper {
+        top: 100px;
+        max-width: calc(100% - 16px);
+        gap: 10px;
+    }
+
+    .search-input {
+        min-width: 0;
+        font-size: 14px;
+    }
+
+    .add-btn {
+        padding: 12px 10px;
+        font-size: 30px;
+    }
+
+    .table-head {
+        top: 162px;
+        margin: 0 8px 12px 8px;
+        padding: 8px 10px;
+    }
+
+    .th-col {
+        font-size: 13px;
+        letter-spacing: 0.2px;
+    }
+
+    .row-item {
+        margin: 8px;
+        padding: 10px;
+        gap: 8px;
+    }
 }
 
 /* POPUP OVERLAY */

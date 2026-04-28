@@ -8,6 +8,7 @@
 
 <!-- Culoarea temei pentru bara de stare pe mobil -->
 <meta name="theme-color" content="#0078d7">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
 <!-- Înregistrarea service worker-ului -->
 <script>
@@ -38,7 +39,7 @@
     <img src="img/logo.png" alt="Logo" class="hub-logo">
     <h1>HUB Service Auto</h1>
 
-    <button id="themeToggle" class="theme-toggle">🌙</button>
+    <button id="themeToggle" class="theme-toggle" type="button" aria-label="Rezervat pentru viitor">🌙</button>
 </header>
 
     <!-- GRID PRINCIPAL -->
@@ -72,6 +73,7 @@
 
                     <span class="hub-label">Deviz detaliat</span>
                 </a>
+
             </div>
         </section>
 
@@ -92,7 +94,7 @@
                     <span class="hub-label">Consumabile</span>
                 </a>
 
-                <a href="modules/stocuri/piese-sh.html" class="hub-card" data-card="piese-sh">
+                <a href="modules/stocuri/stoc_magazie.html" class="hub-card" data-card="piese-stoc">
                     <span class="hub-icon">
                         <!-- SVG-ul va fi injectat aici -->
                         <svg viewBox="0 0 24 24" fill="none" stroke="#1e293b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -106,7 +108,7 @@
                     </span>
 
 
-                    <span class="hub-label">(X)-Piese SH</span>
+                    <span class="hub-label">Piese Stoc</span>
                 </a>
 
                 <a href="modules/stocuri/comenzi.html" class="hub-card" data-card="comenzi-piese">
@@ -160,7 +162,7 @@
 
                     <span class="hub-label">Adaugă mașină</span>
                 </a>
-
+            </div>
         </section>
 
         <!-- ALTE FORMULARE -->
@@ -216,9 +218,9 @@
 	<!-- PARTEA CU FOOTHER -->
 	
 	<footer class="hub-footer">
-    Hub Service Auto — v0.2.0 • made by Aza for Don CSN Auto
+    Hub Service Auto — v0.2.2 • made by Aza for Don CSN Auto
     <div class="footer-updates">
-        Ultimele update-uri: <span style="color:#b450ff;">-2026-04-22-### Release: Telefoane Clienti/- Pagina finalizată și stabilizată./- Include toate optimizările din v0.0.9.</span>
+        Ultimele update-uri: <span style="color:#b450ff;">-2026-04-27-### Update: Salvare în Cloud: Devizele sunt acum salvate automat în Google Sheets/Arhivă & Recuperare: Adăugată funcția „Load” care permite reîncărcarea oricărui deviz salvat anterior folosind numărul de înmatriculare./PWA (App Mode): Site-ul poate fi instalat acum ca o aplicație nativă pe telefon, oferind un spațiu de lucru mai mare și acces rapid.</span>
     </div>
 </footer>
 
