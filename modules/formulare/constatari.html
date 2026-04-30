@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Constatări Atelier</title>
+    <link rel="manifest" href="../../manifest.json">
+    <meta name="theme-color" content="#0078d7">
+    <link rel="stylesheet" href="../../css/style.css">
+
+    <style>
+      body {
+        background: radial-gradient(circle at top, #1f2937 0, #020617 45%, #000 100%);
+        margin: 0;
+        font-family: Segoe UI, sans-serif;
+        color: #ffffff;
+        padding-top: 130px; /* spatiu pentru header fix */
+      }
+
+      /* HEADER FIX (copiat ca stil din lista_auto) */
+      .hub-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 9999;
+        background: radial-gradient(circle at top, #1f2937 0, #020617 45%, #000 100%);
+        color: #ffffff;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 0px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        padding-left: 15px;
+      }
+
+      .hub-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+      }
+
+      .hub-logo {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      .hub-title {
+        font-size: 30px;
+        font-weight: 800;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .hub-right {
+        display: flex;
+        gap: 10px;
+        margin-right: 20px;
+        align-items: center;
+      }
+
+      .btn-back {
+        background: #8b5cf6;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+
+      .btn-back:hover {
+        box-shadow: 0 0 12px rgba(139, 92, 246, 0.6);
+        transform: translateY(-1px);
+      }
+
+      /* Buton + */
+      #addBtn {
+        background: transparent;
+        color: #22c55e;
+        font-size: 22px;
+        font-weight: bold;
+        border: 2px solid #22c55e;
+        padding: 4px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: 0.2s ease;
+      }
+      #addBtn:hover {
+        background: rgba(34, 197, 94, 0.15);
+      }
+
+      .header-line {
+        width: 100%;
+        height: 3px;
+        background: #b450ff;
+        box-shadow: 0 0 10px rgba(180, 80, 255, 0.7);
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        z-index: 9998;
+      }
+
+      /* GRID CARDURI */
+      .lista-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 18px;
+        padding: 20px;
+      }
+
+      /* CARD */
+      .card {
+        background: #1e293b;
+        color: #ffffff;
+        border-radius: 14px;
+        padding: 16px;
+        border: 1px solid #334155;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        position: relative;
+        z-index: 1;
+      }
+      .card:hover {
+        transform: scale(1.01);
+        box-shadow: 0 0 14px rgba(0,0,0,0.55);
+        z-index: 5;
+      }
+
+      /* CULORI BORDURA (Status) */
+      .status-in-lucru { border-left: 8px solid #3b82f6; } /* albastru */
+      .status-asteptare-piese { border-left: 8px solid #f59e0b; } /* portocaliu */
+      .status-finalizat { border-left: 8px solid #22c55e; } /* verde */
+      .status-arhivat { border-left: 8px solid #64748b; } /* slate */
+
+      /* Header card: Nr + Model */
+      .card .nr {
+        font-size: 1.6rem;
+        font-weight: 800;
+        margin-bottom: 6px;
+      }
+      .card .model {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 12px;
+        color: #cbd5e1;
+      }
+
+      /* Defectiuni - scroll intern */
+      .defectiuni {
+        font-size: 1.05rem;
+        line-height: 1.35;
+        background: rgba(255,255,255,0.05);
+        padding: 10px;
+        border-radius: 10px;
+        max-height: 200px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+      }
+
+      .piese-extra {
+        margin-top: 10px;
+        font-size: 1.0rem;
+        color: #e5e7eb;
+        white-space: pre-wrap;
+      }
+      .piese-extra b {
+        color: #93c5fd;
+      }
+
+      .piese-current {
+        margin: 8px 0 12px;
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid #334155;
+        background: rgba(255,255,255,0.05);
+        color: #e5e7eb;
+        white-space: pre-wrap;
+      }
+
+      /* Butoane card */
+      .butoane {
+        margin-top: 14px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .btn-row {
+        display: flex;
+        gap: 10px;
+        width: 100%;
+      }
+
+      .btn-row .btn {
+        min-width: 0;
+      }
+
+      .archive-bar {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 10px 20px 0;
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .btn-archive-toggle {
+        background: #111827;
+        color: #e5e7eb;
+        border: 1px solid #334155;
+        padding: 10px 14px;
+        border-radius: 10px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.15s ease;
+      }
+      .btn-archive-toggle:hover { background: #0f172a; }
+      .btn-archive-toggle.active {
+        background: rgba(180, 80, 255, 0.22);
+        border-color: #b450ff;
+        box-shadow: 0 0 10px rgba(180, 80, 255, 0.35);
+      }
+
+      .btn {
+        flex: 1;
+        min-width: 140px;
+        padding: 10px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 14px;
+        text-align: center;
+        text-decoration: none;
+        transition: 0.15s ease;
+      }
+
+      .btn-piese { background: #2563eb; color: #fff; }
+      .btn-piese:hover { background: #1e40af; }
+
+      .btn-status { background: #475569; color: #e2e8f0; }
+      .btn-status:hover { background: #334155; }
+
+      .btn-poze { background: #0f172a; color: #e2e8f0; border: 1px solid #334155; }
+      .btn-poze:hover { background: #111827; }
+
+      .btn[disabled] {
+        opacity: 0.55;
+        cursor: not-allowed;
+      }
+
+      /* Empty/error state */
+      .state {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 14px 20px 0;
+        color: #cbd5e1;
+      }
+
+      /* MODAL */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.6);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+        padding: 18px;
+      }
+
+      .modal {
+        width: min(560px, 100%);
+        background: #0b1220;
+        border: 1px solid #334155;
+        border-radius: 14px;
+        box-shadow: 0 14px 45px rgba(0,0,0,0.6);
+        padding: 16px;
+      }
+
+      .modal h3 {
+        margin: 0 0 12px 0;
+        font-size: 22px;
+        color: #b57aff;
+      }
+
+      .form-row label {
+        display: block;
+        color: #cbd5e1;
+        font-weight: 650;
+        margin: 10px 0 6px;
+      }
+
+      .form-row input,
+      .form-row textarea,
+      .form-row select {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid #334155;
+        background: #0f172a;
+        color: #e5e7eb;
+        font-size: 15px;
+        box-sizing: border-box;
+      }
+
+      .form-row textarea { min-height: 120px; resize: vertical; }
+
+      .modal-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 14px;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+      }
+
+      .btn-secondary {
+        background: #334155;
+        color: #e2e8f0;
+      }
+
+      .btn-primary {
+        background: #22c55e;
+        color: #06210f;
+      }
+
+      .btn-primary:hover { filter: brightness(0.95); }
+
+      @media (max-width: 760px) {
+        body { padding-top: 120px; }
+        .hub-title { font-size: 22px; }
+        .hub-logo { width: 52px; height: 52px; }
+        .btn-back { padding: 9px 12px; }
+        .lista-container { padding: 14px; gap: 14px; }
+        .btn { min-width: 0; }
+      }
+    </style>
+</head>
+<body>
+  <header class="hub-header">
+    <div class="hub-left">
+      <img src="../../icons/96x96.png" class="hub-logo" alt="Logo">
+      <span class="hub-title">Constatări Atelier</span>
+    </div>
+
+    <div class="hub-right">
+      <button class="btn-back" onclick="window.location.href='../../index.html'">
+        ← Înapoi la HUB
+      </button>
+      <button id="addBtn" type="button" title="Mașină Nouă">+</button>
+    </div>
+
+    <div class="header-line"></div>
+  </header>
+
+  <div class="archive-bar">
+    <button id="archiveToggle" class="btn-archive-toggle" type="button">Vezi Arhivă</button>
+  </div>
+
+  <div id="state" class="state"></div>
+  <div id="lista" class="lista-container"></div>
+
+  <!-- MODAL: Mașină Nouă -->
+  <div id="modalOverlay" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal">
+      <h3 id="modalTitle">Mașină Nouă</h3>
+
+      <form id="addCarForm">
+        <div class="form-row">
+          <label for="nrInmatriculare">Nr. Înmatriculare</label>
+          <input id="nrInmatriculare" type="text" autocomplete="off" placeholder="ex: B-123-ABC">
+        </div>
+
+        <div class="form-row">
+          <label for="model">Model Mașină</label>
+          <input id="model" type="text" autocomplete="off" placeholder="ex: VW Passat 2.0 TDI">
+        </div>
+
+        <div class="form-row">
+          <label for="defectiuni">Defecțiuni Constatate</label>
+          <textarea id="defectiuni" placeholder="Scrie aici..."></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button id="modalCancel" class="btn btn-secondary" type="button">Anulează</button>
+          <button id="modalSubmit" class="btn btn-primary" type="submit">Adaugă</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Adaugă piese -->
+  <div id="modalPieseOverlay" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalPieseTitle">
+    <div class="modal">
+      <h3 id="modalPieseTitle">Adaugă Piese</h3>
+      <div id="pieseCurrent" class="piese-current"></div>
+      <div class="form-row">
+        <label for="inpPiese">Piese / Observații extra (Coloana E)</label>
+        <textarea id="inpPiese" placeholder="ex: Filtru ulei, plăcuțe frână..."></textarea>
+      </div>
+      <div class="modal-actions">
+        <button id="modalPieseCancel" class="btn btn-secondary" type="button">Anulează</button>
+        <button id="modalPieseSubmit" class="btn btn-primary" type="button">Salvează</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Schimbă status -->
+  <div id="modalStatusOverlay" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalStatusTitle">
+    <div class="modal">
+      <h3 id="modalStatusTitle">Schimbă Status</h3>
+      <div class="form-row">
+        <label for="selStatus">Status (Coloana F)</label>
+        <select id="selStatus">
+          <option value="IN_LUCRU">În lucru</option>
+          <option value="ASTEPTARE_PIESE">Așteptare piese</option>
+          <option value="FINALIZAT">Finalizat</option>
+          <option value="ARHIVAT">Arhivează</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button id="modalStatusCancel" class="btn btn-secondary" type="button">Anulează</button>
+        <button id="modalStatusSubmit" class="btn btn-primary" type="button">Salvează</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * IMPORTANT:
+     * 1) Citirea datelor se face EXCLUSIV din CSV (ca în `modules/stocuri/stoc_magazie.html`).
+     *    Folosește URL-ul CSV pentru tab-ul CONSTATARI (gid-ul corect).
+     * 2) SCRIPT_URL (Apps Script) este folosit DOAR pentru POST (adăugare / update).
+     */
+    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSSZzYq1y3T1pVWitPxkWf4hxk9BtonhdGgRuW3VKAMG5MNckUu1iaoO-eDuQ8FOYHaUqjkqAiefGeH/pub?gid=0&single=true&output=csv"; // ex: "https://docs.google.com/spreadsheets/d/e/.../pub?gid=123&single=true&output=csv"
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzVH_F4VyUWA89YJzdUc1P0nO3cq5U24gOTTmDZGprFwi15g2k1Tdba3GzSLdnyrtsa/exec"; // POST only
+
+    // Mapare coloane: A (Data), B (Nr_Inm), C (Model), D (Defectiuni), E (Piese_Extra), F (Status), G (Link_Drive)
+    const STATUS = {
+      IN_LUCRU: "IN_LUCRU",
+      ASTEPTARE_PIESE: "ASTEPTARE_PIESE",
+      FINALIZAT: "FINALIZAT",
+      ARHIVAT: "ARHIVAT"
+    };
+
+    let rowsCache = [];
+    let editingRow = null;
+    let showArchive = false;
+
+    function normalizeText(v) {
+      return String(v ?? "").trim();
+    }
+
+    // CSV parsing (copiat ca abordare din `stoc_magazie.html`)
+    function parseCsvLine(line) {
+      const cols = [];
+      let current = "";
+      let inQuotes = false;
+
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === "\"") {
+          if (inQuotes && line[i + 1] === "\"") {
+            current += "\"";
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (char === "," && !inQuotes) {
+          cols.push(current.trim());
+          current = "";
+        } else {
+          current += char;
+        }
+      }
+
+      cols.push(current.trim());
+      return cols.map((c) => c.replace(/^"|"$/g, ""));
+    }
+
+    function parseCSV(text) {
+      const lines = String(text || "")
+        .split(/\r?\n/)
+        .filter((line) => line.trim().length > 0);
+
+      if (lines.length <= 1) return [];
+
+      const rows = lines.map(parseCsvLine);
+      const dataRows = rows.slice(1);
+
+      return dataRows.map((row, dataRowIdx) => {
+        // Mapare A..G => index 0..6
+        // Opțional: dacă ai o coloană suplimentară pentru rowIndex (ex: H), o citim din index 7.
+        const rowIndexRaw = row[7];
+        const rowIndexParsed = rowIndexRaw != null && String(rowIndexRaw).trim() !== ""
+          ? Number(String(rowIndexRaw).trim())
+          : null;
+
+        return {
+          A: row[0] || "",
+          B: row[1] || "",
+          C: row[2] || "",
+          D: row[3] || "",
+          E: row[4] || "",
+          F: row[5] || "",
+          G: row[6] || "",
+          // Dacă CSV nu include o coloană pentru index, derivăm din poziția rândului din sheet:
+          // dataRows[0] corespunde (de regulă) rândului 2 din sheet => rowIndex = 1 (0-based + 1).
+          rowIndex: Number.isFinite(rowIndexParsed) ? rowIndexParsed : (dataRowIdx + 1)
+        };
+      }).filter((item) => normalizeText(item.B) || normalizeText(item.C) || normalizeText(item.D));
+    }
+
+    function readCol(item, key, idx) {
+      // suportă atât array [A,B,C..] cât și obiect {A:..., B:...} / {nrInm:...}
+      if (Array.isArray(item)) {
+        return item[idx] ?? "";
+      }
+
+      if (item && typeof item === "object") {
+        if (key in item) return item[key] ?? "";
+        // variante de naming
+        const alt = {
+          A: ["data", "date", "Data"],
+          B: ["nr_inm", "nrInm", "nr", "numar", "Nr_Inm"],
+          C: ["model", "Model"],
+          D: ["defectiuni", "defecțiuni", "Defectiuni", "Defecțiuni"],
+          E: ["piese_extra", "pieseExtra", "Piese_Extra"],
+          F: ["status", "Status"],
+          G: ["link_drive", "linkDrive", "link", "Link_Drive"]
+        };
+        const candidates = alt[key] || [];
+        for (const c of candidates) {
+          if (c in item) return item[c] ?? "";
+        }
+      }
+      return "";
+    }
+
+    function getRowIndex(item) {
+      if (!item || typeof item !== "object") return null;
+      return item.rowIndex ?? item.row ?? item._rowIndex ?? null;
+    }
+
+    function statusToClass(statusRaw) {
+      const s = normalizeText(statusRaw).toUpperCase();
+      if (s === STATUS.ARHIVAT) return "status-arhivat";
+      if (s === STATUS.ASTEPTARE_PIESE) return "status-asteptare-piese";
+      if (s === STATUS.FINALIZAT) return "status-finalizat";
+      return "status-in-lucru";
+    }
+
+    function safeLink(linkRaw) {
+      const link = normalizeText(linkRaw);
+      if (!link) return "#";
+      if (link.startsWith("http://") || link.startsWith("https://")) return link;
+      return "#";
+    }
+
+    function setState(text) {
+      document.getElementById("state").innerText = text || "";
+    }
+
+    function render(rows) {
+      const container = document.getElementById("lista");
+      container.innerHTML = "";
+
+      // Filtru: implicit NU afișăm ARHIVAT; în mod Arhivă afișăm DOAR ARHIVAT
+      const visible = rows.filter(item => {
+        const status = normalizeText(readCol(item, "F", 5)).toUpperCase();
+        if (showArchive) return status === STATUS.ARHIVAT;
+        return status !== STATUS.ARHIVAT;
+      });
+
+      if (!visible.length) {
+        setState("Nu există constatări (sau toate sunt arhivate).");
+        return;
+      }
+      setState("");
+
+      visible.forEach(item => {
+        const nrInm = normalizeText(readCol(item, "B", 1));
+        const model = normalizeText(readCol(item, "C", 2));
+        const defectiuni = normalizeText(readCol(item, "D", 3));
+        const pieseExtra = normalizeText(readCol(item, "E", 4));
+        const pieseExtraDisplay = pieseExtra ? pieseExtra.replace(/\r?\n+/g, ", ").trim() : "";
+        const status = normalizeText(readCol(item, "F", 5)).toUpperCase() || STATUS.IN_LUCRU;
+        const linkDrive = safeLink(readCol(item, "G", 6));
+        const rowIndex = getRowIndex(item);
+        let currentStatus = status;
+
+        const card = document.createElement("div");
+        card.className = `card ${statusToClass(status)}`;
+
+        const btnDisabled = rowIndex == null;
+
+        card.innerHTML = `
+          <div class="nr">${nrInm || "-"}</div>
+          <div class="model">${model || ""}</div>
+
+          <div class="defectiuni">${defectiuni || "-"}</div>
+
+          <div class="piese-extra"><b>Piese:</b> ${pieseExtraDisplay || "-"}</div>
+
+          <div class="butoane">
+            <div class="btn-row">
+              <button class="btn btn-piese" type="button" ${btnDisabled ? "disabled" : ""}>Adaugă Piese</button>
+              <button class="btn btn-poze" type="button" ${linkDrive === "#" ? "disabled" : ""}>Poze</button>
+            </div>
+            <button class="btn btn-status" type="button" ${btnDisabled ? "disabled" : ""}>Schimbă Status</button>
+          </div>
+        `;
+
+        const btnPiese = card.querySelector(".btn-piese");
+        const btnPoze = card.querySelector(".btn-poze");
+        const btnStatus = card.querySelector(".btn-status");
+
+        const setCardStatusUi = (newStatus) => {
+          card.classList.remove("status-in-lucru", "status-asteptare-piese", "status-finalizat", "status-arhivat");
+          card.classList.add(statusToClass(newStatus));
+        };
+
+        setCardStatusUi(currentStatus);
+
+        btnPiese?.addEventListener("click", () => openPieseModal({ rowIndex, current: pieseExtra, nrInm }));
+
+        btnStatus?.addEventListener("click", () => {
+          if (btnDisabled) return;
+          openStatusModal({
+            rowIndex,
+            current: currentStatus,
+            nrInm,
+            onUpdated: (newStatus) => {
+              currentStatus = newStatus;
+
+              const shouldBeVisibleNow = showArchive
+                ? newStatus === STATUS.ARHIVAT
+                : newStatus !== STATUS.ARHIVAT;
+
+              if (!shouldBeVisibleNow) {
+                card.remove();
+                if (!container.children.length) {
+                  setState(showArchive ? "Nu există constatări arhivate." : "Nu există constatări (sau toate sunt arhivate).");
+                }
+                return;
+              }
+
+              setCardStatusUi(newStatus);
+            }
+          });
+        });
+
+        btnPoze?.addEventListener("click", () => {
+          if (linkDrive !== "#") window.open(linkDrive, "_blank");
+        });
+
+        container.appendChild(card);
+      });
+    }
+
+    async function loadData() {
+      if (!CSV_URL) {
+        rowsCache = [];
+        render(rowsCache);
+        setState("Setează `CSV_URL` (link CSV pentru tab-ul CONSTATARI) în `modules/formulare/constatari.html`.");
+        return;
+      }
+
+      try {
+        setState("Se încarcă din CSV...");
+        const res = await fetch(CSV_URL);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const csvText = await res.text();
+        rowsCache = parseCSV(csvText);
+        render(rowsCache);
+      } catch (e) {
+        console.error("Eroare la încărcare CSV:", e);
+        rowsCache = [];
+        render(rowsCache);
+        setState("Eroare la încărcare CSV. Verifică `CSV_URL` (tab CONSTATARI publicat cu output=csv).");
+      }
+    }
+
+    async function postToSheet(payload) {
+      if (!SCRIPT_URL) {
+        throw new Error("Lipsește `SCRIPT_URL` (Apps Script).");
+      }
+
+      try {
+        // NOTE: `no-cors` => răspuns opaque (nu putem valida statusul din browser),
+        // dar este modul tipic cerut de Apps Script în multe setup-uri publice.
+        console.log("[constatari] POST =>", SCRIPT_URL, payload);
+        alert("Se trimite cererea...");
+        await fetch(SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          cache: "no-cache",
+          body: JSON.stringify(payload)
+        });
+        console.log("[constatari] POST trimis cu succes (no-cors, fara raspuns accesibil). Payload:", payload);
+        return true;
+      } catch (e) {
+        const message = e instanceof Error ? e.message : String(e);
+        console.error("Eroare la trimitere:", e);
+        throw new Error(message || "Eroare necunoscută la trimitere.");
+      }
+    }
+
+    // ---------- Modal helpers ----------
+    function openOverlay(id) {
+      const el = document.getElementById(id);
+      if (el) el.style.display = "flex";
+    }
+    function closeOverlay(id) {
+      const el = document.getElementById(id);
+      if (el) el.style.display = "none";
+    }
+
+    // Add new
+    function openAddModal() {
+      document.getElementById("nrInmatriculare").value = "";
+      document.getElementById("model").value = "";
+      document.getElementById("defectiuni").value = "";
+      openOverlay("modalOverlay");
+      setTimeout(() => document.getElementById("nrInmatriculare")?.focus(), 0);
+    }
+
+    async function submitAdd(e) {
+      e.preventDefault();
+      console.log("[constatari] submitAdd submit");
+      const nrInm = normalizeText(document.getElementById("nrInmatriculare").value).toUpperCase();
+      const model = normalizeText(document.getElementById("model").value);
+      const defectiuni = normalizeText(document.getElementById("defectiuni").value);
+
+      if (!nrInm) { alert("Completează Nr. Înmatriculare."); return; }
+      if (!model) { alert("Completează Model Mașină."); return; }
+      if (!defectiuni) { alert("Completează Defecțiuni Constatate."); return; }
+
+      const submitBtn = document.getElementById("modalSubmit");
+      const cancelBtn = document.getElementById("modalCancel");
+      const prevSubmitText = submitBtn?.innerText || "";
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Se salvează...";
+      }
+      if (cancelBtn) cancelBtn.disabled = true;
+      setState("Se salvează...");
+
+      const payload = {
+        nrInmatriculare: nrInm,
+        model,
+        defectiuni,
+        linkDrive: "",
+        mecanic: ""
+      };
+
+      try {
+        await postToSheet(payload);
+        closeOverlay("modalOverlay");
+        window.location.reload();
+      } catch (e) {
+        const message = e instanceof Error ? e.message : String(e);
+        alert(`Salvarea a eșuat: ${message}`);
+        setState("");
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerText = prevSubmitText || "Adaugă";
+        }
+        if (cancelBtn) cancelBtn.disabled = false;
+      }
+    }
+
+    // Piese modal
+    function openPieseModal({ rowIndex, current, nrInm }) {
+      if (rowIndex == null) return;
+      editingRow = { rowIndex, type: "piese" };
+      document.getElementById("modalPieseTitle").innerText = `Adaugă Piese — ${nrInm || ""}`;
+      document.getElementById("pieseCurrent").innerText = current ? `Existente:\n${current}` : "Existente: -";
+      document.getElementById("inpPiese").value = "";
+      openOverlay("modalPieseOverlay");
+      setTimeout(() => document.getElementById("inpPiese")?.focus(), 0);
+    }
+
+    async function submitPiese() {
+      if (!editingRow || editingRow.type !== "piese") return;
+      const value = normalizeText(document.getElementById("inpPiese").value).replace(/\r?\n+/g, ", ").trim();
+      if (!value) { alert("Completează piesa/observația nouă."); return; }
+      const payload = {
+        rowIndex: editingRow.rowIndex,
+        pieseExtra: value
+      };
+
+      try {
+        setState("Se salvează...");
+        await postToSheet(payload);
+        closeOverlay("modalPieseOverlay");
+        editingRow = null;
+        window.location.reload();
+      } catch (e) {
+        const message = e instanceof Error ? e.message : String(e);
+        alert(`Salvarea pieselor a eșuat: ${message}`);
+        setState("");
+      }
+    }
+
+    // Status modal
+    function openStatusModal({ rowIndex, current, nrInm, onUpdated }) {
+      if (rowIndex == null) return;
+      editingRow = { rowIndex, type: "status", onUpdated };
+      document.getElementById("modalStatusTitle").innerText = `Schimbă Status — ${nrInm || ""}`;
+      document.getElementById("selStatus").value = current || STATUS.IN_LUCRU;
+      openOverlay("modalStatusOverlay");
+    }
+
+    async function submitStatus() {
+      if (!editingRow || editingRow.type !== "status") return;
+      const value = normalizeText(document.getElementById("selStatus").value).toUpperCase();
+      const payload = {
+        rowIndex: editingRow.rowIndex,
+        status: value
+      };
+
+      try {
+        setState("Se salvează...");
+        await postToSheet(payload);
+        closeOverlay("modalStatusOverlay");
+        editingRow.onUpdated?.(value);
+        editingRow = null;
+        setState("");
+      } catch (e) {
+        const message = e instanceof Error ? e.message : String(e);
+        alert(`Salvarea statusului a eșuat: ${message}`);
+        setState("");
+      }
+    }
+
+    // Wire events
+    document.getElementById("addBtn").addEventListener("click", openAddModal);
+    document.getElementById("modalCancel").addEventListener("click", () => closeOverlay("modalOverlay"));
+    document.getElementById("addCarForm").addEventListener("submit", submitAdd);
+
+    document.getElementById("archiveToggle")?.addEventListener("click", () => {
+      showArchive = !showArchive;
+      const btn = document.getElementById("archiveToggle");
+      if (btn) {
+        btn.classList.toggle("active", showArchive);
+        btn.innerText = showArchive ? "Vezi Active" : "Vezi Arhivă";
+      }
+      render(rowsCache);
+    });
+
+    document.getElementById("modalPieseCancel").addEventListener("click", () => { editingRow = null; closeOverlay("modalPieseOverlay"); });
+    document.getElementById("modalPieseSubmit").addEventListener("click", submitPiese);
+
+    document.getElementById("modalStatusCancel").addEventListener("click", () => { editingRow = null; closeOverlay("modalStatusOverlay"); });
+    document.getElementById("modalStatusSubmit").addEventListener("click", submitStatus);
+
+    // Close modals on overlay click / ESC
+    ["modalOverlay", "modalPieseOverlay", "modalStatusOverlay"].forEach(id => {
+      const el = document.getElementById(id);
+      el?.addEventListener("click", (e) => { if (e.target === el) closeOverlay(id); });
+    });
+    window.addEventListener("keydown", (e) => {
+      if (e.key !== "Escape") return;
+      closeOverlay("modalOverlay");
+      closeOverlay("modalPieseOverlay");
+      closeOverlay("modalStatusOverlay");
+      editingRow = null;
+    });
+
+    window.onload = loadData;
+  </script>
+</body>
+</html>
