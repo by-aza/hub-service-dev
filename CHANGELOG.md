@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.4.1 — 2026-05-02
+### Update: Optimizare Flux Constatări
+- Editare Bidirecțională: Implementată posibilitatea de a edita și șterge piese direct din interfață prin suprascrierea celulelor în Google Sheets.
+- Sincronizare Instantanee: Adăugată actualizarea imediată a cardului în browser (DOM) după salvare, eliminând așteptarea latenței de cache Google CSV.
+- Implementat scroll vertical pentru secțiunile "Defecțiuni" și "Piese" pentru a menține cardurile compacte.
+- Dezactivarea butonului "Salvează" în timpul procesării pentru a preveni dubla trimitere a datelor.
+- Adăugată legenda vizuală pentru statusuri (În lucru, Așteptare piese, Finalizat) sub antetul paginii.
+
 ## v0.3.0 — 2026-04-28
 ### Release: Stoc Piese
 - Noua pagină stoc_magazie.html este acum activă, oferind gestiune completă pentru piesele noi și SH cu locații specifice pe raft.

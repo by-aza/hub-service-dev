@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Constatări Atelier</title>
+    <title>Constatări</title>
     <link rel="manifest" href="../../manifest.json">
     <meta name="theme-color" content="#0078d7">
     <link rel="stylesheet" href="../../css/style.css">
@@ -125,6 +125,8 @@
         transition: transform 0.25s ease, box-shadow 0.25s ease;
         position: relative;
         z-index: 1;
+        display: flex;
+        flex-direction: column;
       }
       .card:hover {
         transform: scale(1.01);
@@ -140,14 +142,15 @@
 
       /* Header card: Nr + Model */
       .card .nr {
-        font-size: 1.6rem;
+        font-size: 1.45rem; /* Redus puțin */
         font-weight: 800;
-        margin-bottom: 6px;
+        margin-top: 0; /* Lipit de sus */
+        margin-bottom: 4px;
       }
       .card .model {
-        font-size: 1.2rem;
+        font-size: 1.1rem; /* Redus fontul */
         font-weight: 600;
-        margin-bottom: 12px;
+        margin-bottom: 8px; /* Distanță mai mică */
         color: #cbd5e1;
       }
 
@@ -158,9 +161,18 @@
         background: rgba(255,255,255,0.05);
         padding: 10px;
         border-radius: 10px;
-        max-height: 200px;
+        max-height: 75px; /* Aproximativ 3-4 rânduri */
         overflow-y: auto;
         white-space: pre-wrap;
+        padding-right: 4px;
+      }
+      /* Stil scrollbar pentru defectiuni (discret) */
+      .defectiuni::-webkit-scrollbar {
+        width: 3px;
+      }
+      .defectiuni::-webkit-scrollbar-thumb {
+        background: rgba(180, 80, 255, 0.4);
+        border-radius: 10px;
       }
 
       .piese-extra {
@@ -168,10 +180,48 @@
         font-size: 1.0rem;
         color: #e5e7eb;
         white-space: pre-wrap;
+        max-height: 120px; /* Mărită înălțimea zonei de scroll */
+        overflow-y: auto;
+        padding-right: 4px;
       }
+      /* Stil scrollbar pentru piese (subțire și discret) */
+      .piese-extra::-webkit-scrollbar {
+        width: 3px;
+      }
+      .piese-extra::-webkit-scrollbar-thumb {
+        background: rgba(180, 80, 255, 0.4);
+        border-radius: 10px;
+      }
+
       .piese-extra b {
         color: #93c5fd;
       }
+
+      /* Legendă statusuri */
+      .status-legend {
+        display: flex;
+        gap: 15px;
+        padding: 5px 20px;
+        margin-top: -10px;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+        font-size: 0.85rem;
+        color: #9ca3af;
+      }
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .legend-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .dot-in-lucru { background: #3b82f6; }
+      .dot-asteptare { background: #f59e0b; }
+      .dot-finalizat { background: #22c55e; }
+      .dot-arhivat { background: #64748b; }
 
       .piese-current {
         margin: 8px 0 12px;
@@ -185,7 +235,8 @@
 
       /* Butoane card */
       .butoane {
-        margin-top: 14px;
+        margin-top: auto; /* Împinge butoanele spre baza cardului */
+        padding-top: 14px;
         display: flex;
         gap: 10px;
         flex-wrap: wrap;
@@ -333,11 +384,18 @@
 
       @media (max-width: 760px) {
         body { padding-top: 120px; }
-        .hub-title { font-size: 22px; }
-        .hub-logo { width: 52px; height: 52px; }
-        .btn-back { padding: 9px 12px; }
-        .lista-container { padding: 14px; gap: 14px; }
+        .hub-title { font-size: 20px; } /* Redus fontul pentru titlu pe mobil */
+        .hub-logo { width: 48px; height: 48px; }
+        .btn-back { padding: 8px 10px; font-size: 0.9rem; }
+        .lista-container { padding: 12px; gap: 12px; }
+        .card { padding: 12px; } /* Redus padding-ul interior al cardului */
         .btn { min-width: 0; }
+      }
+
+      @media (max-width: 600px) {
+        .hub-title { font-size: 18px; } /* Font și mai mic pentru ecrane sub 600px */
+        .hub-header { padding-left: 10px; }
+        .hub-right { margin-right: 10px; }
       }
     </style>
 </head>
@@ -345,18 +403,25 @@
   <header class="hub-header">
     <div class="hub-left">
       <img src="../../icons/96x96.png" class="hub-logo" alt="Logo">
-      <span class="hub-title">Constatări Atelier</span>
+      <span class="hub-title">Constatări</span>
     </div>
 
     <div class="hub-right">
       <button class="btn-back" onclick="window.location.href='../../index.html'">
-        ← Înapoi la HUB
+        ← Înapoi
       </button>
       <button id="addBtn" type="button" title="Mașină Nouă">+</button>
     </div>
 
     <div class="header-line"></div>
   </header>
+
+  <div class="status-legend">
+    <div class="legend-item"><span class="legend-dot dot-in-lucru"></span> În lucru</div>
+    <div class="legend-item"><span class="legend-dot dot-asteptare"></span> Așteptare piese</div>
+    <div class="legend-item"><span class="legend-dot dot-finalizat"></span> Finalizat</div>
+    <div class="legend-item"><span class="legend-dot dot-arhivat"></span> Arhivat</div>
+  </div>
 
   <div class="archive-bar">
     <button id="archiveToggle" class="btn-archive-toggle" type="button">Vezi Arhivă</button>
@@ -398,7 +463,6 @@
   <div id="modalPieseOverlay" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalPieseTitle">
     <div class="modal">
       <h3 id="modalPieseTitle">Adaugă Piese</h3>
-      <div id="pieseCurrent" class="piese-current"></div>
       <div class="form-row">
         <label for="inpPiese">Piese / Observații extra (Coloana E)</label>
         <textarea id="inpPiese" placeholder="ex: Filtru ulei, plăcuțe frână..."></textarea>
@@ -438,7 +502,7 @@
      * 2) SCRIPT_URL (Apps Script) este folosit DOAR pentru POST (adăugare / update).
      */
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSSZzYq1y3T1pVWitPxkWf4hxk9BtonhdGgRuW3VKAMG5MNckUu1iaoO-eDuQ8FOYHaUqjkqAiefGeH/pub?gid=0&single=true&output=csv"; // ex: "https://docs.google.com/spreadsheets/d/e/.../pub?gid=123&single=true&output=csv"
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzVH_F4VyUWA89YJzdUc1P0nO3cq5U24gOTTmDZGprFwi15g2k1Tdba3GzSLdnyrtsa/exec"; // POST only
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwA7OMHi0KGlkAPhElX6ANMGck8KjWQicYi_rRVty6qTJSSupdJXKOEd8cFYKaGasA1/exec"; // POST only
 
     // Mapare coloane: A (Data), B (Nr_Inm), C (Model), D (Defectiuni), E (Piese_Extra), F (Status), G (Link_Drive)
     const STATUS = {
@@ -509,9 +573,8 @@
           E: row[4] || "",
           F: row[5] || "",
           G: row[6] || "",
-          // Dacă CSV nu include o coloană pentru index, derivăm din poziția rândului din sheet:
-          // dataRows[0] corespunde (de regulă) rândului 2 din sheet => rowIndex = 1 (0-based + 1).
-          rowIndex: Number.isFinite(rowIndexParsed) ? rowIndexParsed : (dataRowIdx + 1)
+          // dataRows[0] este rândul 2 din Google Sheets (rândul 1 fiind header-ul)
+          rowIndex: Number.isFinite(rowIndexParsed) ? rowIndexParsed : (dataRowIdx + 2)
         };
       }).filter((item) => normalizeText(item.B) || normalizeText(item.C) || normalizeText(item.D));
     }
@@ -625,9 +688,27 @@
           card.classList.add(statusToClass(newStatus));
         };
 
+        const setCardPieseUi = (newPiese) => {
+          const pieseEl = card.querySelector(".piese-extra");
+          if (pieseEl) {
+            const display = newPiese ? newPiese.replace(/\r?\n+/g, ", ").trim() : "-";
+            pieseEl.innerHTML = `<b>Piese:</b> ${display}`;
+          }
+        };
+
         setCardStatusUi(currentStatus);
 
-        btnPiese?.addEventListener("click", () => openPieseModal({ rowIndex, current: pieseExtra, nrInm }));
+        btnPiese?.addEventListener("click", () => {
+          openPieseModal({
+            rowIndex,
+            current: item.E || "",
+            nrInm,
+            onUpdated: (newPiese) => {
+              item.E = newPiese; // update local cache
+              setCardPieseUi(newPiese);
+            }
+          });
+        });
 
         btnStatus?.addEventListener("click", () => {
           if (btnDisabled) return;
@@ -692,17 +773,19 @@
       }
 
       try {
-        // NOTE: `no-cors` => răspuns opaque (nu putem valida statusul din browser),
-        // dar este modul tipic cerut de Apps Script în multe setup-uri publice.
         console.log("[constatari] POST =>", SCRIPT_URL, payload);
         alert("Se trimite cererea...");
-        await fetch(SCRIPT_URL, {
+        
+        // Am eliminat no-cors pentru a putea încerca să citim răspunsul. 
+        // Dacă Google Apps Script returnează ContentService, ar trebui să funcționeze.
+        const response = await fetch(SCRIPT_URL, {
           method: "POST",
-          mode: "no-cors",
-          cache: "no-cache",
           body: JSON.stringify(payload)
         });
-        console.log("[constatari] POST trimis cu succes (no-cors, fara raspuns accesibil). Payload:", payload);
+
+        const resultText = await response.text();
+        console.log("[constatari] Răspuns primit de la Google Apps Script:", resultText);
+        
         return true;
       } catch (e) {
         const message = e instanceof Error ? e.message : String(e);
@@ -778,35 +861,55 @@
     }
 
     // Piese modal
-    function openPieseModal({ rowIndex, current, nrInm }) {
+    function openPieseModal({ rowIndex, current, nrInm, onUpdated }) {
       if (rowIndex == null) return;
-      editingRow = { rowIndex, type: "piese" };
-      document.getElementById("modalPieseTitle").innerText = `Adaugă Piese — ${nrInm || ""}`;
-      document.getElementById("pieseCurrent").innerText = current ? `Existente:\n${current}` : "Existente: -";
-      document.getElementById("inpPiese").value = "";
+      editingRow = { rowIndex, type: "piese", onUpdated };
+      document.getElementById("modalPieseTitle").innerText = `Gestionare Piese — ${nrInm || ""}`;
+      document.getElementById("inpPiese").value = current || "";
       openOverlay("modalPieseOverlay");
       setTimeout(() => document.getElementById("inpPiese")?.focus(), 0);
     }
 
     async function submitPiese() {
       if (!editingRow || editingRow.type !== "piese") return;
-      const value = normalizeText(document.getElementById("inpPiese").value).replace(/\r?\n+/g, ", ").trim();
-      if (!value) { alert("Completează piesa/observația nouă."); return; }
+      const value = normalizeText(document.getElementById("inpPiese").value);
+      
       const payload = {
         rowIndex: editingRow.rowIndex,
-        pieseExtra: value
+        pieseNoi: value // Am schimbat din pieseExtra în pieseNoi conform cerinței
       };
 
+      const submitBtn = document.getElementById("modalPieseSubmit");
+      const cancelBtn = document.getElementById("modalPieseCancel");
+      const prevBtnText = submitBtn.innerText;
+
       try {
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.innerText = "Se salvează...";
+        }
+        if (cancelBtn) cancelBtn.disabled = true;
+
         setState("Se salvează...");
         await postToSheet(payload);
+        
+        // Actualizare instantanee în UI
+        editingRow.onUpdated?.(value);
+        
         closeOverlay("modalPieseOverlay");
         editingRow = null;
-        window.location.reload();
+        setState("Piese salvate cu succes!");
+        setTimeout(() => setState(""), 3000);
       } catch (e) {
         const message = e instanceof Error ? e.message : String(e);
         alert(`Salvarea pieselor a eșuat: ${message}`);
         setState("");
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerText = prevBtnText;
+        }
+        if (cancelBtn) cancelBtn.disabled = false;
       }
     }
 
