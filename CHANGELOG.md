@@ -8,11 +8,19 @@
 - Dezactivarea butonului "Salvează" în timpul procesării pentru a preveni dubla trimitere a datelor.
 - Adăugată legenda vizuală pentru statusuri (În lucru, Așteptare piese, Finalizat) sub antetul paginii.
 
-## v0.3.0 — 2026-04-28
-### Release: Stoc Piese
-- Noua pagină stoc_magazie.html este acum activă, oferind gestiune completă pentru piesele noi și SH cu locații specifice pe raft.
-- Sincronizare Gestiune: Coloanele de date sunt acum mapate pentru o vizualizare rapidă și precisă.
-- Alertă Stoc Critic: Implementată evidențierea vizuală prin culori (roșu) pentru piesele cu stoc zero.
+## v0.4.0 — 2026-04-28
+### Release: Constatari service
+- Noua pagină constatari.html permite acum înregistrarea mașinilor în atelier și gestionarea defectelor în timp real.
+- Workflow Interactiv: Implementat sistem de statusuri colorate (În lucru, Așteptare Piese, Finalizat) pentru monitorizarea vizuală a fluxului de reparații.
+- Input Dinamic (Write-Sync): Adăugat formularul de „Mașină Nouă” și funcția de „Adăugare Piese” care scriu datele direct în Google Sheets prin Apps Script.
+- Sistem de Arhivare: Funcție de filtrare pentru curățarea listei de lucru și mutarea dosarelor finalizate într-o secțiune de arhivă protejată.
+- Optimizare Mobil: Design compact cu scroll intern pentru carduri, adaptat pentru utilizarea rapidă pe telefon de către mecanici.
+
+## v0.3.0 — 2026-04-30
+### Release: Telefoane clienti (public)
+- Pagina finalizată și stabilizată.
+- Publicată în folderul public.
+- Include toate optimizările din v0.1.0.
 
 ## v0.2.2 — 2026-04-27
 - Salvare în Cloud: Devizele sunt acum salvate automat în Google Sheets, eliminând riscul pierderii datelor din browser.
