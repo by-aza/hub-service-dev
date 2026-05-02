@@ -398,6 +398,34 @@
       transform: translateY(-1px);
     }
 
+    .btn-whatsapp {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background-color: #25D366;
+      color: #fff;
+      padding: 6px 14px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-top: 10px;
+      transition: transform 0.1s, filter 0.1s, box-shadow 0.1s;
+      width: fit-content;
+      border: none;
+      box-shadow: 0 4px 10px rgba(37, 211, 102, 0.2);
+    }
+
+    .btn-whatsapp:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.1);
+      box-shadow: 0 6px 14px rgba(37, 211, 102, 0.3);
+    }
+
+    .btn-whatsapp svg {
+      fill: currentColor;
+    }
+
     .empty-state {
       font-size: 0.85rem;
       color: var(--text-muted);
@@ -640,6 +668,28 @@
           ? `<a class="site-link" href="${siteUrl}" target="_blank" rel="noopener noreferrer">Link Site <span aria-hidden="true">↗</span></a>`
           : "";
 
+        const stocValue = parseInt(item.stoc) || 0;
+        let whatsappHtml = "";
+        if (stocValue > 0) {
+          const message = `Salut! Comanda piesă:\n\n` +
+            `• *Piesă:* ${item.denumire}\n` +
+            `• *Cod OEM:* ${item.codOEM || "-"}\n` +
+            `• *Locație Raft:* ${item.raft || "-"}\n` +
+            `• *Observații:* ${item.observatii || "-"}\n` +
+            `• *ID Site:* ${item.idSite || "-"}\n` +
+            `• *Link:* ${item.linkSite || "-"}`;
+          
+          const waUrl = `https://wa.me/40754488535?text=${encodeURIComponent(message)}`;
+          whatsappHtml = `
+            <a href="${waUrl}" target="_blank" class="btn-whatsapp">
+              <svg width="16" height="16" viewBox="0 0 24 24">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.455-.148-.67-.148-.23 0-.437.05-.62.148-.183.099-.366.247-.544.446-.178.198-.32.445-.426.742-.106.297-.158.619-.158.966 0 .346.052.668.158.965.106.297.248.545.426.743.178.198.361.346.544.445.183.1.39.149.62.149.215 0 .397-.049.544-.148.147-.099.32-.247.52-.446.199-.198.342-.445.426-.742.084-.297.126-.619.126-.966 0-.346-.042-.668-.126-.965-.084-.297-.227-.545-.426-.743-.199-.198-.373-.346-.52-.445-.147-.1-.329-.149-.544-.149-.215 0-.422.05-.62.149-.198.099-.341.247-.426.445-.084.198-.126.42-.126.668 0 .248.042.47.126.669.085.198.228.346.426.445.198.099.405.149.62.149.215 0 .397-.05.544-.149.147-.1.32-.247.52-.445.199-.198.342-.446.426-.743.084-.297.126-.619.126-.966zM12.004 0C5.384 0 0 5.384 0 12.004c0 2.108.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413A11.783 11.783 0 0012.004 0z"/>
+              </svg>
+              Comandă WhatsApp
+            </a>
+          `;
+        }
+
         row.innerHTML = `
           <div class="prod-main">
             <div class="prod-name" style="color: ${parseInt(item.stoc) === 0 ? 'red' : 'inherit'}">${item.denumire}</div>
@@ -662,6 +712,8 @@
                 ${siteLinkHtml}
               </span>
             </div>
+            
+            ${whatsappHtml}
           </div>
 
           <div class="prod-right">

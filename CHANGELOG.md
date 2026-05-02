@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.4.2 — 2026-05-02
+### Update: Optimizare Constatări+Integrare WhatsApp & Optimizare Mobile
+- Editare Bidirecțională: Implementată posibilitatea de a edita și șterge piese direct din interfață.
+- Comandă Rapidă WhatsApp: Implementat buton dinamic în stoc_magazie.html care generează un mesaj de comandă predefinit către magazioner.
+- Implementat scroll vertical pentru secțiunile "Defecțiuni" și "Piese" pentru a menține cardurile compacte.
+- Dezactivarea butonului "Salvează" în timpul procesării pentru a preveni dubla trimitere a datelor.
+- Adăugată legenda vizuală pentru statusuri (În lucru, Așteptare piese, Finalizat) sub antetul paginii.
+
 ## v0.4.1 — 2026-05-02
 ### Update: Optimizare Flux Constatări
 - Editare Bidirecțională: Implementată posibilitatea de a edita și șterge piese direct din interfață prin suprascrierea celulelor în Google Sheets.
