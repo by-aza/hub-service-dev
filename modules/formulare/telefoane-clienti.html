@@ -6,6 +6,7 @@
     <title>Telefoane Clienți</title>
     <link rel="manifest" href="../../manifest.json">
     <meta name="theme-color" content="#0078d7">
+    <script src="../../js/config.js"></script>
     <script>
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
@@ -628,7 +629,7 @@
     
     <script>
         
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzVj7js45c2TP-J2huSxT6ZInfimZ9h77PCHwqJ-PO5QcfclNbIJZ7nqpnf9NTlmRK-dw/exec"; // URL-ul tău e bun
+  const SCRIPT_URL = window.CONFIG?.VITE_CLIENTI_URL || "https://script.google.com/macros/s/AKfycbzVj7js45c2TP-J2huSxT6ZInfimZ9h77PCHwqJ-PO5QcfclNbIJZ7nqpnf9NTlmRK-dw/exec"; // URL-ul tău e bun
 
   let dateComplete = []; // Aici vom păstra copia datelor pentru căutare
 

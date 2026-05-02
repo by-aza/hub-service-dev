@@ -6,6 +6,7 @@
     <title>Constatări</title>
     <link rel="manifest" href="../../manifest.json">
     <meta name="theme-color" content="#0078d7">
+    <script src="../../js/config.js"></script>
     <link rel="stylesheet" href="../../css/style.css">
 
     <style>
@@ -512,7 +513,7 @@
      * 2) SCRIPT_URL (Apps Script) este folosit DOAR pentru POST (adăugare / update).
      */
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSSZzYq1y3T1pVWitPxkWf4hxk9BtonhdGgRuW3VKAMG5MNckUu1iaoO-eDuQ8FOYHaUqjkqAiefGeH/pub?gid=0&single=true&output=csv"; // ex: "https://docs.google.com/spreadsheets/d/e/.../pub?gid=123&single=true&output=csv"
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwA7OMHi0KGlkAPhElX6ANMGck8KjWQicYi_rRVty6qTJSSupdJXKOEd8cFYKaGasA1/exec"; // POST only
+    const SCRIPT_URL = window.CONFIG?.VITE_CONSTATARI_URL || "https://script.google.com/macros/s/AKfycbwA7OMHi0KGlkAPhElX6ANMGck8KjWQicYi_rRVty6qTJSSupdJXKOEd8cFYKaGasA1/exec"; // POST only
 
     // Mapare coloane: A (Data), B (Nr_Inm), C (Model), D (Defectiuni), E (Piese_Extra), F (Status), G (Link_Drive)
     const STATUS = {
