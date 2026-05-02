@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.4.3 — 2026-05-02
+### Update: Optimizare Constatări+Integrare WhatsApp & Optimizare Mobile
+- Implementat funcția de inversare a listelor în Constatari și Telefoane Clienti.
+- Integrat buton rapid de WhatsApp lângă fiecare contact si link active de tip tel.
+- Rescris structura CSS pentru telefoane-clienti.html folosind containere flexibile pentru a preveni ieșirea iconițelor din ecran.
+- Optimizat alinierea header-ului cu datele din tabel pe ecrane înguste.
+
 ## v0.4.2 — 2026-05-02
 ### Update: Optimizare Constatări+Integrare WhatsApp & Optimizare Mobile
 - Editare Bidirecțională: Implementată posibilitatea de a edita și șterge piese direct din interfață.

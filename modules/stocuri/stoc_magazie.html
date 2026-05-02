@@ -671,13 +671,13 @@
         const stocValue = parseInt(item.stoc) || 0;
         let whatsappHtml = "";
         if (stocValue > 0) {
-          const message = `Salut! Comanda piesă:\n\n` +
+          const message = `${item.linkSite || "-"}\n\n` +
+            `Salut! Comanda piesă:\n\n` +
             `• *Piesă:* ${item.denumire}\n` +
             `• *Cod OEM:* ${item.codOEM || "-"}\n` +
             `• *Locație Raft:* ${item.raft || "-"}\n` +
             `• *Observații:* ${item.observatii || "-"}\n` +
-            `• *ID Site:* ${item.idSite || "-"}\n` +
-            `• *Link:* ${item.linkSite || "-"}`;
+            `• *ID Site:* ${item.idSite || "-"}`;
           
           const waUrl = `https://wa.me/40754488535?text=${encodeURIComponent(message)}`;
           whatsappHtml = `

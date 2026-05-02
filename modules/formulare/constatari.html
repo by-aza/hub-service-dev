@@ -383,11 +383,22 @@
       .btn-primary:hover { filter: brightness(0.95); }
 
       @media (max-width: 760px) {
-        body { padding-top: 120px; }
+        body { padding-top: 110px; } /* Mai puțin padding sus */
+        .hub-header { padding-top: 10px; padding-bottom: 10px; }
         .hub-title { font-size: 20px; } /* Redus fontul pentru titlu pe mobil */
         .hub-logo { width: 48px; height: 48px; }
         .btn-back { padding: 8px 10px; font-size: 0.9rem; }
-        .lista-container { padding: 12px; gap: 12px; }
+        .header-line { height: 2px; } /* Linie mai subțire */
+        .status-legend { 
+          margin-top: -5px; 
+          margin-bottom: 5px; 
+          padding: 2px 15px; 
+          gap: 10px;
+          font-size: 0.75rem; 
+        }
+        .archive-bar { padding: 5px 15px 0; }
+        .btn-archive-toggle { padding: 6px 10px; font-size: 0.8rem; }
+        .lista-container { padding: 10px; gap: 10px; }
         .card { padding: 12px; } /* Redus padding-ul interior al cardului */
         .btn { min-width: 0; }
       }
@@ -407,7 +418,7 @@
     </div>
 
     <div class="hub-right">
-      <button class="btn-back" onclick="window.location.href='../../index.html'">
+      <button class="btn-back" id="btnBack">
         ← Înapoi
       </button>
       <button id="addBtn" type="button" title="Mașină Nouă">+</button>
@@ -420,7 +431,6 @@
     <div class="legend-item"><span class="legend-dot dot-in-lucru"></span> În lucru</div>
     <div class="legend-item"><span class="legend-dot dot-asteptare"></span> Așteptare piese</div>
     <div class="legend-item"><span class="legend-dot dot-finalizat"></span> Finalizat</div>
-    <div class="legend-item"><span class="legend-dot dot-arhivat"></span> Arhivat</div>
   </div>
 
   <div class="archive-bar">
@@ -758,6 +768,7 @@
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const csvText = await res.text();
         rowsCache = parseCSV(csvText);
+        rowsCache.reverse(); // Cele mai recente intrări primele
         render(rowsCache);
       } catch (e) {
         console.error("Eroare la încărcare CSV:", e);
@@ -838,7 +849,7 @@
       const payload = {
         nrInmatriculare: nrInm,
         model,
-        defectiuni,
+        defectiuni: defectiuni.replace(/\n+/g, ', '), // Înlocuim Enter cu virgulă
         linkDrive: "",
         mecanic: ""
       };
@@ -872,7 +883,7 @@
 
     async function submitPiese() {
       if (!editingRow || editingRow.type !== "piese") return;
-      const value = normalizeText(document.getElementById("inpPiese").value);
+      const value = normalizeText(document.getElementById("inpPiese").value).replace(/\n+/g, ', '); // Înlocuim Enter cu virgulă
       
       const payload = {
         rowIndex: editingRow.rowIndex,
@@ -930,21 +941,58 @@
         status: value
       };
 
+      const submitBtn = document.getElementById("modalStatusSubmit");
+      const cancelBtn = document.getElementById("modalStatusCancel");
+      const prevBtnText = submitBtn.innerText;
+
       try {
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.style.backgroundColor = "#475569"; // Gri
+          submitBtn.innerText = "Se salvează...";
+        }
+        if (cancelBtn) cancelBtn.disabled = true;
+
         setState("Se salvează...");
         await postToSheet(payload);
         closeOverlay("modalStatusOverlay");
         editingRow.onUpdated?.(value);
         editingRow = null;
-        setState("");
+        setState("Status actualizat!");
+        setTimeout(() => setState(""), 3000);
       } catch (e) {
         const message = e instanceof Error ? e.message : String(e);
         alert(`Salvarea statusului a eșuat: ${message}`);
         setState("");
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.style.backgroundColor = ""; // Reset color
+          submitBtn.innerText = prevBtnText;
+        }
+        if (cancelBtn) cancelBtn.disabled = false;
       }
     }
 
     // Wire events
+    document.getElementById("btnBack")?.addEventListener("click", () => {
+      // Dacă există istoric de navigare, mergem înapoi. 
+      // Altfel, dacă suntem în context PWA/Standalone, închidem fereastra.
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.close();
+      }
+    });
+
+    // Actualizăm textul butonului în funcție de istoric la încărcare
+    window.addEventListener("DOMContentLoaded", () => {
+      const btnBack = document.getElementById("btnBack");
+      if (btnBack && window.history.length <= 1) {
+        btnBack.innerText = "✕ Exit";
+      }
+    });
+
     document.getElementById("addBtn").addEventListener("click", openAddModal);
     document.getElementById("modalCancel").addEventListener("click", () => closeOverlay("modalOverlay"));
     document.getElementById("addCarForm").addEventListener("submit", submitAdd);
