@@ -1018,6 +1018,15 @@
       editingRow = null;
     });
 
+    if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      // Mergem două niveluri sus pentru a găsi sw.js din rădăcină
+      navigator.serviceWorker.register('../../sw.js', { scope: '/' })
+        .then(reg => console.log('Service Worker înregistrat cu succes!', reg))
+        .catch(err => console.log('Eroare la înregistrarea Service Worker:', err));
+    });
+  }
+
     window.onload = loadData;
   </script>
 </body>

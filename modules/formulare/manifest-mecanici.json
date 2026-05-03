@@ -2,7 +2,7 @@
   "name": "Constatări Mecanici",
   "short_name": "Constatări",
   "description": "Formular constatari tehnice pentru mecanici",
-  "scope": "/modules/formulare/",
+  "scope": "/",
   "start_url": "constatari.html",
   "display": "standalone",
   "background_color": "#ffffff",
