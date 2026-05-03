@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Constatări</title>
-    <link rel="manifest" href="../../manifest.json">
+    <link rel="manifest" href="manifest-mecanici.json">
     <meta name="theme-color" content="#0078d7">
     <script src="../../js/config.js"></script>
     <link rel="stylesheet" href="../../css/style.css">
@@ -988,11 +988,21 @@
 
     // Actualizăm textul butonului în funcție de istoric la încărcare
     window.addEventListener("DOMContentLoaded", () => {
-      const btnBack = document.getElementById("btnBack");
-      if (btnBack && window.history.length <= 1) {
-        btnBack.innerText = "✕ Exit";
-      }
-    });
+  const btnBack = document.getElementById("btnBack");
+  
+  // Verificăm dacă pagina este deschisă ca aplicație instalată (PWA)
+  const isPWA = window.matchMedia('(display-mode: standalone)').matches;
+
+  if (btnBack) {
+    if (isPWA) {
+      // Dacă e PWA, ștergem butonul de tot din pagină
+      btnBack.remove(); 
+    } else if (window.history.length <= 1) {
+      // Dacă e în browser normal dar e prima pagină deschisă
+      btnBack.innerText = "✕ Exit";
+    }
+  }
+});
 
     document.getElementById("addBtn").addEventListener("click", openAddModal);
     document.getElementById("modalCancel").addEventListener("click", () => closeOverlay("modalOverlay"));
