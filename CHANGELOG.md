@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.4.4 — 2026-05-03
+### Update: Modul "Constatări Extra"+ Îmbunătățiri
+- S-a adăugat o nouă rubrică pentru notarea defecțiunilor descoperite ulterior recepției mașinii.
+- Interfață Inteligentă: Buton nou + Extra integrat pe cardul mașinii, aliniat la dreapta pentru acces rapid.
+- Sistem de Pop-up (Modal): Implementarea unui flux de lucru similar cu cel de piese pentru o experiență de utilizare unitară.
+- Afișare Dinamică: Observațiile extra apar acum automat pe card sub un marcaj discret (Obs:), facilitând citirea rapidă.
+- Extinderea bazei de date (Coloana H) și actualizarea scriptului API pentru a suporta noile câmpuri de date.
+
 ## v0.4.3 — 2026-05-02
 ### Update: Optimizare Constatări+Integrare WhatsApp & Optimizare Mobile
 - Implementat funcția de inversare a listelor în Constatari și Telefoane Clienti.

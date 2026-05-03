@@ -142,11 +142,31 @@
       .status-arhivat { border-left: 8px solid #64748b; } /* slate */
 
       /* Header card: Nr + Model */
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 4px;
+      }
       .card .nr {
         font-size: 1.45rem; /* Redus puțin */
         font-weight: 800;
-        margin-top: 0; /* Lipit de sus */
-        margin-bottom: 4px;
+        margin: 0;
+      }
+      .btn-extra-add {
+        background: rgba(180, 80, 255, 0.15);
+        color: #b450ff;
+        border: 1px solid rgba(180, 80, 255, 0.4);
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .btn-extra-add:hover {
+        background: rgba(180, 80, 255, 0.3);
+        box-shadow: 0 0 8px rgba(180, 80, 255, 0.4);
       }
       .card .model {
         font-size: 1.1rem; /* Redus fontul */
@@ -196,6 +216,14 @@
 
       .piese-extra b {
         color: #93c5fd;
+      }
+
+      .constatari-extra {
+        margin-top: 6px;
+        font-size: 0.9rem;
+        color: #94a3b8;
+        font-style: italic;
+        line-height: 1.3;
       }
 
       /* Legendă statusuri */
@@ -505,6 +533,21 @@
     </div>
   </div>
 
+  <!-- MODAL: Constatări Suplimentare -->
+  <div id="modalExtraOverlay" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalExtraTitle">
+    <div class="modal">
+      <h3 id="modalExtraTitle">Constatări Suplimentare</h3>
+      <div class="form-row">
+        <label for="inpExtra">Observații Extra (Coloana H)</label>
+        <textarea id="inpExtra" placeholder="Alte observații sau constatări..."></textarea>
+      </div>
+      <div class="modal-actions">
+        <button id="modalExtraCancel" class="btn btn-secondary" type="button">Anulează</button>
+        <button id="modalExtraSubmit" class="btn btn-primary" type="button">Salvează</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     /**
      * IMPORTANT:
@@ -513,7 +556,7 @@
      * 2) SCRIPT_URL (Apps Script) este folosit DOAR pentru POST (adăugare / update).
      */
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSSZzYq1y3T1pVWitPxkWf4hxk9BtonhdGgRuW3VKAMG5MNckUu1iaoO-eDuQ8FOYHaUqjkqAiefGeH/pub?gid=0&single=true&output=csv"; // ex: "https://docs.google.com/spreadsheets/d/e/.../pub?gid=123&single=true&output=csv"
-    const SCRIPT_URL = window.CONFIG?.VITE_CONSTATARI_URL || "https://script.google.com/macros/s/AKfycbwA7OMHi0KGlkAPhElX6ANMGck8KjWQicYi_rRVty6qTJSSupdJXKOEd8cFYKaGasA1/exec"; // POST only
+    const SCRIPT_URL = window.CONFIG?.VITE_CONSTATARI_URL || "https://script.google.com/macros/s/AKfycbzJuGfcN_VlSJoShTJ4je8zLka01xgoP32fKIPmRMTg01d0l6Ywp0h7Msm6eNQynImC/exec"; // POST only
 
     // Mapare coloane: A (Data), B (Nr_Inm), C (Model), D (Defectiuni), E (Piese_Extra), F (Status), G (Link_Drive)
     const STATUS = {
@@ -584,6 +627,7 @@
           E: row[4] || "",
           F: row[5] || "",
           G: row[6] || "",
+          H: row[7] || "", // Mapare Coloana H
           // dataRows[0] este rândul 2 din Google Sheets (rândul 1 fiind header-ul)
           rowIndex: Number.isFinite(rowIndexParsed) ? rowIndexParsed : (dataRowIdx + 2)
         };
@@ -606,7 +650,8 @@
           D: ["defectiuni", "defecțiuni", "Defectiuni", "Defecțiuni"],
           E: ["piese_extra", "pieseExtra", "Piese_Extra"],
           F: ["status", "Status"],
-          G: ["link_drive", "linkDrive", "link", "Link_Drive"]
+          G: ["link_drive", "linkDrive", "link", "Link_Drive"],
+          H: ["constatariExtra", "constatari_extra", "Extra"]
         };
         const candidates = alt[key] || [];
         for (const c of candidates) {
@@ -663,6 +708,7 @@
         const defectiuni = normalizeText(readCol(item, "D", 3));
         const pieseExtra = normalizeText(readCol(item, "E", 4));
         const pieseExtraDisplay = pieseExtra ? pieseExtra.replace(/\r?\n+/g, ", ").trim() : "";
+        const constatariExtra = normalizeText(readCol(item, "H", 7));
         const status = normalizeText(readCol(item, "F", 5)).toUpperCase() || STATUS.IN_LUCRU;
         const linkDrive = safeLink(readCol(item, "G", 6));
         const rowIndex = getRowIndex(item);
@@ -674,12 +720,16 @@
         const btnDisabled = rowIndex == null;
 
         card.innerHTML = `
-          <div class="nr">${nrInm || "-"}</div>
+          <div class="card-header">
+            <div class="nr">${nrInm || "-"}</div>
+            <button class="btn-extra-add" type="button" ${btnDisabled ? "disabled" : ""}>+ Extra</button>
+          </div>
           <div class="model">${model || ""}</div>
 
           <div class="defectiuni">${defectiuni || "-"}</div>
 
           <div class="piese-extra"><b>Piese:</b> ${pieseExtraDisplay || "-"}</div>
+          ${constatariExtra ? `<div class="constatari-extra">Obs: ${constatariExtra}</div>` : ""}
 
           <div class="butoane">
             <div class="btn-row">
@@ -693,6 +743,7 @@
         const btnPiese = card.querySelector(".btn-piese");
         const btnPoze = card.querySelector(".btn-poze");
         const btnStatus = card.querySelector(".btn-status");
+        const btnExtra = card.querySelector(".btn-extra-add");
 
         const setCardStatusUi = (newStatus) => {
           card.classList.remove("status-in-lucru", "status-asteptare-piese", "status-finalizat", "status-arhivat");
@@ -707,6 +758,20 @@
           }
         };
 
+        const setCardExtraUi = (newExtra) => {
+          let extraEl = card.querySelector(".constatari-extra");
+          if (newExtra) {
+            if (!extraEl) {
+              extraEl = document.createElement("div");
+              extraEl.className = "constatari-extra";
+              card.querySelector(".piese-extra").after(extraEl);
+            }
+            extraEl.innerText = `Obs: ${newExtra}`;
+          } else if (extraEl) {
+            extraEl.remove();
+          }
+        };
+
         setCardStatusUi(currentStatus);
 
         btnPiese?.addEventListener("click", () => {
@@ -717,6 +782,18 @@
             onUpdated: (newPiese) => {
               item.E = newPiese; // update local cache
               setCardPieseUi(newPiese);
+            }
+          });
+        });
+
+        btnExtra?.addEventListener("click", () => {
+          openExtraModal({
+            rowIndex,
+            current: item.H || "",
+            nrInm,
+            onUpdated: (newExtra) => {
+              item.H = newExtra; // update local cache
+              setCardExtraUi(newExtra);
             }
           });
         });
@@ -788,16 +865,16 @@
         console.log("[constatari] POST =>", SCRIPT_URL, payload);
         alert("Se trimite cererea...");
         
-        // Am eliminat no-cors pentru a putea încerca să citim răspunsul. 
-        // Dacă Google Apps Script returnează ContentService, ar trebui să funcționeze.
-        const response = await fetch(SCRIPT_URL, {
+        // no-cors => răspuns opaque (nu putem valida statusul din browser),
+        // dar evită erorile de tip CORS în majoritatea setup-urilor Apps Script.
+        await fetch(SCRIPT_URL, {
           method: "POST",
+          mode: "no-cors",
+          cache: "no-cache",
           body: JSON.stringify(payload)
         });
 
-        const resultText = await response.text();
-        console.log("[constatari] Răspuns primit de la Google Apps Script:", resultText);
-        
+        console.log("[constatari] POST trimis cu succes (no-cors).");
         return true;
       } catch (e) {
         const message = e instanceof Error ? e.message : String(e);
@@ -851,8 +928,7 @@
         nrInmatriculare: nrInm,
         model,
         defectiuni: defectiuni.replace(/\n+/g, ', '), // Înlocuim Enter cu virgulă
-        linkDrive: "",
-        mecanic: ""
+        linkDrive: ""
       };
 
       try {
@@ -915,6 +991,59 @@
       } catch (e) {
         const message = e instanceof Error ? e.message : String(e);
         alert(`Salvarea pieselor a eșuat: ${message}`);
+        setState("");
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerText = prevBtnText;
+        }
+        if (cancelBtn) cancelBtn.disabled = false;
+      }
+    }
+
+    // Extra modal
+    function openExtraModal({ rowIndex, current, nrInm, onUpdated }) {
+      if (rowIndex == null) return;
+      editingRow = { rowIndex, type: "extra", onUpdated };
+      document.getElementById("modalExtraTitle").innerText = `Constatări Suplimentare — ${nrInm || ""}`;
+      document.getElementById("inpExtra").value = current || "";
+      openOverlay("modalExtraOverlay");
+      setTimeout(() => document.getElementById("inpExtra")?.focus(), 0);
+    }
+
+    async function submitExtra() {
+      if (!editingRow || editingRow.type !== "extra") return;
+      const value = normalizeText(document.getElementById("inpExtra").value).replace(/\n+/g, ', '); // Înlocuim Enter cu virgulă
+      
+      const payload = {
+        rowIndex: editingRow.rowIndex,
+        constatariExtra: value // Coloana H
+      };
+
+      const submitBtn = document.getElementById("modalExtraSubmit");
+      const cancelBtn = document.getElementById("modalExtraCancel");
+      const prevBtnText = submitBtn?.innerText || "Salvează";
+
+      try {
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.innerText = "Se salvează...";
+        }
+        if (cancelBtn) cancelBtn.disabled = true;
+
+        setState("Se salvează...");
+        await postToSheet(payload);
+        
+        // Actualizare instantanee în UI
+        editingRow.onUpdated?.(value);
+        
+        closeOverlay("modalExtraOverlay");
+        editingRow = null;
+        setState("Constatări extra salvate!");
+        setTimeout(() => setState(""), 3000);
+      } catch (e) {
+        const message = e instanceof Error ? e.message : String(e);
+        alert(`Salvarea a eșuat: ${message}`);
         setState("");
       } finally {
         if (submitBtn) {
@@ -1001,6 +1130,9 @@
 
     document.getElementById("modalPieseCancel").addEventListener("click", () => { editingRow = null; closeOverlay("modalPieseOverlay"); });
     document.getElementById("modalPieseSubmit").addEventListener("click", submitPiese);
+
+    document.getElementById("modalExtraCancel").addEventListener("click", () => { editingRow = null; closeOverlay("modalExtraOverlay"); });
+    document.getElementById("modalExtraSubmit").addEventListener("click", submitExtra);
 
     document.getElementById("modalStatusCancel").addEventListener("click", () => { editingRow = null; closeOverlay("modalStatusOverlay"); });
     document.getElementById("modalStatusSubmit").addEventListener("click", submitStatus);
