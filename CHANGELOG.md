@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.4.5 — 2026-05-04
+### Update: Interfață (UI/UX) Constatări + Îmbunătățiri
+- Reorganizare Header Card: s-a adaugat data de intrare in sistem a masinii si data finalizare.
+- Sistem de Culori Status: Data de intrare este afișată în Alb, iar data de finalizare în Verde (sau liniuță - dacă mașina este încă în lucru).
+- Optimizare Fonturi: Dimensiunile textului de pe butoane și etichete au fost reduse pentru un aspect mai profesional și compact.
+- Monitorizare Timp: Implementare automată a datei de finalizare. Când statusul devine FINALIZAT, sistemul scrie automat data curentă în Coloana I.
+- Extinderea bazei de date (Coloana I) și actualizarea scriptului API pentru a suporta noile câmpuri de date.
+
 ## v0.4.4 — 2026-05-03
 ### Update: Modul "Constatări Extra"+ Îmbunătățiri
 - S-a adăugat o nouă rubrică pentru notarea defecțiunilor descoperite ulterior recepției mașinii.

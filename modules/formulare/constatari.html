@@ -153,26 +153,43 @@
         font-weight: 800;
         margin: 0;
       }
+      .card-dates {
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: flex;
+        gap: 4px;
+        align-items: center;
+      }
+      .date-in { color: #ffffff; }
+      .date-out { color: #22c55e; }
+      .date-sep { color: #64748b; }
+
       .btn-extra-add {
         background: rgba(180, 80, 255, 0.15);
         color: #b450ff;
         border: 1px solid rgba(180, 80, 255, 0.4);
-        padding: 4px 8px;
-        border-radius: 6px;
-        font-size: 0.75rem;
+        padding: 6px 10px;
+        border-radius: 8px;
+        font-size: 14px;
         font-weight: 700;
         cursor: pointer;
         transition: 0.2s;
+        flex: 1;
       }
       .btn-extra-add:hover {
         background: rgba(180, 80, 255, 0.3);
         box-shadow: 0 0 8px rgba(180, 80, 255, 0.4);
       }
       .card .model {
-        font-size: 1.1rem; /* Redus fontul */
-        font-weight: 600;
+        font-size: 1.0rem; /* Redus fontul */
+        font-weight: 300;
         margin-bottom: 8px; /* Distanță mai mică */
         color: #cbd5e1;
+        overflow-wrap: break-word; /* Forțează ruperea cuvintelor lungi */
+        white-space: normal; /* Permite trecerea pe rândul următor */
+        text-align: left; /* Aliniere la stânga */
+        padding: 0 4px; /* Mic padding stânga-dreapta */
+        line-height: 1.2;
       }
 
       /* Defectiuni - scroll intern */
@@ -231,8 +248,8 @@
         display: flex;
         gap: 15px;
         padding: 5px 20px;
-        margin-top: -10px;
-        margin-bottom: 10px;
+        margin-top: -30px;
+        margin-bottom: 0px;
         flex-wrap: wrap;
         font-size: 0.85rem;
         color: #9ca3af;
@@ -267,7 +284,7 @@
         margin-top: auto; /* Împinge butoanele spre baza cardului */
         padding-top: 14px;
         display: flex;
-        gap: 10px;
+        gap: 8px;
         flex-wrap: wrap;
       }
 
@@ -309,12 +326,12 @@
       .btn {
         flex: 1;
         min-width: 140px;
-        padding: 10px;
+        padding: 7px;
         border-radius: 8px;
         border: none;
         cursor: pointer;
-        font-weight: 700;
-        font-size: 14px;
+        font-weight: 400;
+        font-size: 15px;
         text-align: center;
         text-decoration: none;
         transition: 0.15s ease;
@@ -323,10 +340,10 @@
       .btn-piese { background: #2563eb; color: #fff; }
       .btn-piese:hover { background: #1e40af; }
 
-      .btn-status { background: #475569; color: #e2e8f0; }
+      .btn-status { background: #475569; color: #e2e8f0; flex: 1.5; }
       .btn-status:hover { background: #334155; }
 
-      .btn-poze { background: #0f172a; color: #e2e8f0; border: 1px solid #334155; }
+      .btn-poze { background: #0f172a; color: #e2e8f0; border: 1px solid #334155; flex: 1; }
       .btn-poze:hover { background: #111827; }
 
       .btn[disabled] {
@@ -556,7 +573,7 @@
      * 2) SCRIPT_URL (Apps Script) este folosit DOAR pentru POST (adăugare / update).
      */
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSSZzYq1y3T1pVWitPxkWf4hxk9BtonhdGgRuW3VKAMG5MNckUu1iaoO-eDuQ8FOYHaUqjkqAiefGeH/pub?gid=0&single=true&output=csv"; // ex: "https://docs.google.com/spreadsheets/d/e/.../pub?gid=123&single=true&output=csv"
-    const SCRIPT_URL = window.CONFIG?.VITE_CONSTATARI_URL || "https://script.google.com/macros/s/AKfycbzJuGfcN_VlSJoShTJ4je8zLka01xgoP32fKIPmRMTg01d0l6Ywp0h7Msm6eNQynImC/exec"; // POST only
+    const SCRIPT_URL = window.CONFIG?.VITE_CONSTATARI_URL || "https://script.google.com/macros/s/AKfycbyZQHjRYFQeEzjTBCKmIyyXbqS-xfIaZlXO_fr1tPb_XbJZ_jNePX7sMzmc6dCLpvRu/exec"; // POST only
 
     // Mapare coloane: A (Data), B (Nr_Inm), C (Model), D (Defectiuni), E (Piese_Extra), F (Status), G (Link_Drive)
     const STATUS = {
@@ -628,6 +645,7 @@
           F: row[5] || "",
           G: row[6] || "",
           H: row[7] || "", // Mapare Coloana H
+          I: row[8] || "", // Mapare Coloana I (Data Finalizare)
           // dataRows[0] este rândul 2 din Google Sheets (rândul 1 fiind header-ul)
           rowIndex: Number.isFinite(rowIndexParsed) ? rowIndexParsed : (dataRowIdx + 2)
         };
@@ -651,7 +669,8 @@
           E: ["piese_extra", "pieseExtra", "Piese_Extra"],
           F: ["status", "Status"],
           G: ["link_drive", "linkDrive", "link", "Link_Drive"],
-          H: ["constatariExtra", "constatari_extra", "Extra"]
+          H: ["constatariExtra", "constatari_extra", "Extra"],
+          I: ["dataFinalizare", "data_finalizare", "Data_Finalizare"]
         };
         const candidates = alt[key] || [];
         for (const c of candidates) {
@@ -685,6 +704,14 @@
       document.getElementById("state").innerText = text || "";
     }
 
+    function formatDateOnly(v) {
+      const s = normalizeText(v);
+      if (!s) return "-";
+      // Dacă e format tip Google Sheets Date (ex: "5/4/2026 14:30:00" sau "2026-05-04")
+      // Extragem doar prima parte înainte de spațiu
+      return s.split(" ")[0] || "-";
+    }
+
     function render(rows) {
       const container = document.getElementById("lista");
       container.innerHTML = "";
@@ -709,6 +736,8 @@
         const pieseExtra = normalizeText(readCol(item, "E", 4));
         const pieseExtraDisplay = pieseExtra ? pieseExtra.replace(/\r?\n+/g, ", ").trim() : "";
         const constatariExtra = normalizeText(readCol(item, "H", 7));
+        const dataIn = formatDateOnly(readCol(item, "A", 0));
+        const dataOut = formatDateOnly(readCol(item, "I", 8));
         const status = normalizeText(readCol(item, "F", 5)).toUpperCase() || STATUS.IN_LUCRU;
         const linkDrive = safeLink(readCol(item, "G", 6));
         const rowIndex = getRowIndex(item);
@@ -722,7 +751,11 @@
         card.innerHTML = `
           <div class="card-header">
             <div class="nr">${nrInm || "-"}</div>
-            <button class="btn-extra-add" type="button" ${btnDisabled ? "disabled" : ""}>+ Extra</button>
+            <div class="card-dates">
+              <span class="date-in">${dataIn}</span>
+              <span class="date-sep">/</span>
+              <span class="date-out">${dataOut}</span>
+            </div>
           </div>
           <div class="model">${model || ""}</div>
 
@@ -732,11 +765,12 @@
           ${constatariExtra ? `<div class="constatari-extra">Obs: ${constatariExtra}</div>` : ""}
 
           <div class="butoane">
+            <button class="btn btn-piese" type="button" ${btnDisabled ? "disabled" : ""}>Adaugă Piese</button>
+            <button class="btn-extra-add" type="button" ${btnDisabled ? "disabled" : ""}>+ Extra</button>
             <div class="btn-row">
-              <button class="btn btn-piese" type="button" ${btnDisabled ? "disabled" : ""}>Adaugă Piese</button>
               <button class="btn btn-poze" type="button" ${linkDrive === "#" ? "disabled" : ""}>Poze</button>
+              <button class="btn btn-status" type="button" ${btnDisabled ? "disabled" : ""}>Schimbă Status</button>
             </div>
-            <button class="btn btn-status" type="button" ${btnDisabled ? "disabled" : ""}>Schimbă Status</button>
           </div>
         `;
 
@@ -1086,7 +1120,15 @@
         setState("Se salvează...");
         await postToSheet(payload);
         closeOverlay("modalStatusOverlay");
-        editingRow.onUpdated?.(value);
+        
+        // Dacă am finalizat, reîncărcăm datele pentru a vedea data de finalizare
+        if (value === STATUS.FINALIZAT) {
+          setState("Se reîncarcă datele...");
+          setTimeout(() => loadData(), 1500); // Mic delay pentru a lăsa timp Apps Script să scrie
+        } else {
+          editingRow.onUpdated?.(value);
+        }
+
         editingRow = null;
         setState("Status actualizat!");
         setTimeout(() => setState(""), 3000);
