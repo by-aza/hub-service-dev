@@ -4,7 +4,7 @@
   "description": "Formular constatari tehnice pentru mecanici",
   "scope": "/",
   "start_url": "constatari.html",
-  "display": "standalone",
+  "display": "minimal-ui",
   "background_color": "#ffffff",
   "theme_color": "#000000",
   "icons": [
