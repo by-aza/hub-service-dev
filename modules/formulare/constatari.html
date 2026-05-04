@@ -1146,15 +1146,15 @@
       }
     }
 
-    // Navigare: Dacă este PWA (standalone), ascundem butonul Back. Altfel, funcționează ca back în istoric.
-    const btnBack = document.getElementById("btnBack");
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-      if (btnBack) btnBack.style.display = 'none';
-    } else {
-      btnBack?.addEventListener("click", () => {
-        window.history.back();
-      });
-    }
+    // Navigare simplă: Butonul va fi mereu vizibil și va duce la index.html
+const btnBack = document.getElementById("btnBack");
+if (btnBack) {
+  btnBack.style.display = 'block'; // Ne asigurăm că e vizibil
+  btnBack.addEventListener("click", () => {
+    // Folosim locație fixă spre index, e mai sigur decât history.back() în PWA
+    window.location.href = "../../index.html"; 
+  });
+}
 
     document.getElementById("addBtn").addEventListener("click", openAddModal);
     document.getElementById("modalCancel").addEventListener("click", () => closeOverlay("modalOverlay"));
