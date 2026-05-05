@@ -78,7 +78,8 @@ body {
 }
 
 .btn-print { background-color: #0275d8; color: white; }
-.btn-add   { background-color: #5cb85c; color: white; }
+    .btn-new   { background-color: #ff9800; color: white; }
+    .btn-add   { background-color: #5cb85c; color: white; }
 .btn-clear { background-color: #c62828; color: white; }
 .btn-save  { background-color: #1565c0; color: white; }
 .btn-load  { background-color: #00897b; color: white; }
@@ -331,6 +332,7 @@ td:nth-child(3) input {
     <!-- BUTOANE -->
     <div class="btn-container">
         <button class="btn btn-print" onclick="window.print()">Printează PDF</button>
+        <button class="btn btn-new" onclick="devizNou()">🆕 Deviz Nou</button>
         <button class="btn btn-add" onclick="addRow()">+ Adaugă Rând</button>
         <button class="btn btn-clear" onclick="clearAll()">Șterge tot devizul</button>
 		<button class="btn btn-save" id="saveBtn" onclick="saveDeviz()">💾 Save</button>
@@ -349,6 +351,8 @@ td:nth-child(3) input {
 
         <!-- DATE AUTOVEHICUL -->
         <div class="info-section">
+            <div><strong>ID Deviz:</strong> <input type="text" id="idDeviz" placeholder="ex: 101" style="width: 100px;"></div>
+            <div><strong>Data:</strong> <input type="date" id="dataDeviz"></div>
             <div><strong>Autovehicul:</strong> <input type="text" id="autovehicul"></div>
             <div><strong>Motorizare:</strong> <input type="text" id="motorizare"></div>
             <div><strong>Nr. înmatriculare:</strong> <input type="text" id="nrAuto" oninput="updateTitle()"></div>
@@ -434,7 +438,74 @@ td:nth-child(3) input {
 //  Adaugă un rând nou în tabel
 // ===============================
 
-const DEVIZ_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwgBGRJTHNMx3ezTBCtBKMd79O8PRLhFq7J93uwTz8TgdJMB5HarXJJinyll8ENwAfkxw/exec";
+const DEVIZ_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxNPg2l1UB4AorIi4b4r6IOsNf5aPaFeArhXmh7G3t08MSga6vrHlyuABp3KFastDmrYw/exec";
+
+// Inițializare ID și Dată la deschidere
+window.addEventListener('DOMContentLoaded', () => {
+    if (!document.getElementById('dataDeviz').value) {
+        const now = new Date();
+        const dd = String(now.getDate()).padStart(2, '0');
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const yyyy = now.getFullYear();
+        // Dacă e input type="date", trebuie YYYY-MM-DD. 
+        // Dar utilizatorul vrea logica DD.MM.YYYY. 
+        // Voi schimba tipul inputului în text via JS pentru a respecta cerința de a nu atinge HTML direct
+        const dataInput = document.getElementById('dataDeviz');
+        dataInput.type = "text"; 
+        dataInput.value = `${dd}.${mm}.${yyyy}`;
+        dataInput.placeholder = "DD.MM.YYYY";
+    }
+    
+    // Prefix automat "D-" pentru ID Deviz
+    const idInput = document.getElementById('idDeviz');
+    idInput.addEventListener('blur', function() {
+        let val = this.value.trim();
+        if (val && !val.startsWith('D-') && !isNaN(val)) {
+            this.value = 'D-' + val;
+        }
+        updateTitle();
+    });
+    idInput.addEventListener('input', updateTitle);
+});
+
+async function devizNou() {
+    if (confirm("Ești sigur că vrei să începi un deviz nou? Datele nesalvate se vor pierde.")) {
+        clearAll();
+        
+        // Resetăm data în format DD.MM.YYYY
+        const now = new Date();
+        const dd = String(now.getDate()).padStart(2, '0');
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const yyyy = now.getFullYear();
+        document.getElementById('dataDeviz').value = `${dd}.${mm}.${yyyy}`;
+
+        // Logică incrementare ID
+        const btn = event?.target || document.querySelector('.btn-new');
+        const oldText = btn.innerText;
+        if(btn) { btn.disabled = true; btn.innerText = "⏳..."; }
+        
+        try {
+            const response = await fetch(DEVIZ_SCRIPT_URL);
+            const devize = parseDevizeResponse(await response.text());
+            let maxNum = 100;
+            devize.forEach(d => {
+                const id = Array.isArray(d) ? d[6] : (d.idDeviz || d.G);
+                if (id && String(id).startsWith('D-')) {
+                    const num = parseInt(id.replace('D-', ''));
+                    if (!isNaN(num) && num > maxNum) maxNum = num;
+                }
+            });
+            document.getElementById('idDeviz').value = 'D-' + (maxNum + 1);
+        } catch (e) {
+            document.getElementById('idDeviz').value = "";
+        } finally {
+            if(btn) { btn.disabled = false; btn.innerText = oldText; }
+            addRow();
+            document.getElementById('idDeviz').focus();
+            updateTitle();
+        }
+    }
+}
 
 function normalizeText(value) {
     return String(value || "").trim().toLowerCase();
@@ -519,13 +590,21 @@ function fillItemsTable(piese) {
 
 //  Functia incarcare Deviz salvat
 async function loadDeviz() {
+    const idCautat = document.getElementById("idDeviz").value.trim();
     const nrCautat = document.getElementById("nrAuto").value.trim();
-    if (!nrCautat) {
-        alert("Introdu numărul de înmatriculare înainte de Load.");
+    const loadBtn = event?.target || document.querySelector('.btn-load');
+
+    if (!idCautat && !nrCautat) {
+        alert("Introdu ID Deviz sau Numărul de înmatriculare înainte de Load.");
         return;
     }
 
     try {
+        if (loadBtn) {
+            loadBtn.disabled = true;
+            loadBtn.innerText = "⏳...";
+        }
+
         const response = await fetch(DEVIZ_SCRIPT_URL, {
             method: "GET"
         });
@@ -541,25 +620,39 @@ async function loadDeviz() {
             return;
         }
 
-        const targetPlate = normalizeText(nrCautat);
-        const devizGasit = devize.find(item => {
-            const plateValue = Array.isArray(item)
-                ? (item[2] ?? "")
-                : (item.nrInmatriculare ?? item.nrAuto ?? item["Nr. înmatriculare"] ?? item["nr inmatriculare"] ?? item.C ?? "");
+        let devizGasit = null;
 
-            const plateNormalized = normalizeText(plateValue);
-            if (!plateNormalized || plateNormalized.includes("inmatriculare")) {
-                return false;
-            }
+        // 1. Prioritate ID: Căutăm după ID Deviz dacă este completat
+        if (idCautat) {
+            devizGasit = devize.find(item => {
+                const idValue = Array.isArray(item)
+                    ? (item[6] ?? "") // Coloana G
+                    : (item.idDeviz ?? item.ID ?? item.G ?? "");
+                return String(idValue).trim() === idCautat;
+            });
+        }
 
-            return plateNormalized === targetPlate;
-        });
+        // 2. Fallback: Dacă nu am găsit după ID (sau ID-ul era gol), căutăm după Nr. Înmatriculare
+        if (!devizGasit && nrCautat) {
+            const targetPlate = normalizeText(nrCautat);
+            // Inversăm array-ul pentru a găsi ULTIMA intrare (cea mai recentă)
+            devizGasit = [...devize].reverse().find(item => {
+                const plateValue = Array.isArray(item)
+                    ? (item[2] ?? "") // Coloana C
+                    : (item.nrInmatriculare ?? item.nrAuto ?? item["Nr. înmatriculare"] ?? item.C ?? "");
+
+                const plateNormalized = normalizeText(plateValue);
+                if (!plateNormalized || plateNormalized.includes("inmatriculare")) return false;
+                return plateNormalized === targetPlate;
+            });
+        }
 
         if (!devizGasit) {
-            alert("Devizul nu a fost găsit");
+            alert("Devizul nu a fost găsit (verifică ID-ul sau Nr. Auto).");
             return;
         }
 
+        // 3. Populare completă a câmpurilor
         const autovehicul = Array.isArray(devizGasit)
             ? (devizGasit[0] ?? "")
             : (devizGasit.autovehicul ?? devizGasit.Autovehicul ?? devizGasit.A ?? "");
@@ -572,22 +665,57 @@ async function loadDeviz() {
         const pieseRaw = Array.isArray(devizGasit)
             ? (devizGasit[3] ?? "")
             : (devizGasit.piese ?? devizGasit.Piese ?? devizGasit.D ?? "");
+        const dataSalvare = Array.isArray(devizGasit)
+            ? (devizGasit[5] ?? "") // Coloana F (index 5)
+            : (devizGasit.dataDeviz ?? devizGasit.data ?? devizGasit.F ?? "");
+        const idDeviz = Array.isArray(devizGasit)
+            ? (devizGasit[6] ?? "") // Coloana G (index 6)
+            : (devizGasit.idDeviz ?? devizGasit.ID ?? devizGasit.G ?? "");
+        const discountVal = Array.isArray(devizGasit)
+            ? (devizGasit[7] ?? 0) // Coloana H (index 7)
+            : (devizGasit.discountGlobal ?? devizGasit.discountPercent ?? devizGasit.discount ?? 0);
 
         document.getElementById("autovehicul").value = autovehicul;
         document.getElementById("motorizare").value = motorizare;
         document.getElementById("nrAuto").value = nrInmatriculare;
+        document.getElementById("idDeviz").value = idDeviz;
+        
+        // Conversie dată în format DD.MM.YYYY pentru afișare
+        if (dataSalvare) {
+            try {
+                const d = new Date(dataSalvare);
+                if (!isNaN(d.getTime())) {
+                    const dd = String(d.getDate()).padStart(2, '0');
+                    const mm = String(d.getMonth() + 1).padStart(2, '0');
+                    const yyyy = d.getFullYear();
+                    document.getElementById("dataDeviz").value = `${dd}.${mm}.${yyyy}`;
+                } else {
+                    document.getElementById("dataDeviz").value = dataSalvare;
+                }
+            } catch(e) { 
+                document.getElementById("dataDeviz").value = dataSalvare;
+            }
+        } else {
+            document.getElementById("dataDeviz").value = "";
+        }
+
+        document.getElementById("discountPercent").value = discountVal;
 
         const piese = parsePieseValue(pieseRaw);
         fillItemsTable(piese);
 
         calculate();
         updateTitle();
-        alert("Deviz încărcat din Google Sheets.");
+        alert("Deviz încărcat cu succes.");
     } catch (error) {
         console.error("Eroare la încărcare:", error);
-        alert("Încărcarea a eșuat. Verifică scriptul Apps Script (doGet) și conexiunea.");
+        alert("Încărcarea a eșuat. Verifică conexiunea.");
+    } finally {
+        if (loadBtn) {
+            loadBtn.disabled = false;
+            loadBtn.innerText = "📂 Load";
+        }
     }
-
 }
 
 //  Functia salvare Deviz
@@ -619,10 +747,13 @@ async function saveDeviz() {
     });
 
     const payload = {
+        idDeviz: document.getElementById("idDeviz").value.trim(),
+        dataDeviz: document.getElementById("dataDeviz").value,
         autovehicul: document.getElementById("autovehicul").value.trim(),
         motorizare: document.getElementById("motorizare").value.trim(),
         nrInmatriculare: document.getElementById("nrAuto").value.trim(),
         piese: data,
+        discountGlobal: parseFloat(document.getElementById("discountPercent").value) || 0,
         totalGeneral: parseFloat(document.getElementById("grandTotal").innerText) || 0
     };
 
@@ -706,9 +837,10 @@ function clearAll() {
 // ===============================
 function updateTitle() {
     const nr = document.getElementById('nrAuto').value.trim();
+    const id = document.getElementById('idDeviz').value.trim();
 
-    if (nr.length > 0) {
-        document.title = "Deviz reparatie - " + nr;
+    if (nr || id) {
+        document.title = `Deviz reparatie - ${nr || 'FaraNr'} - ${id || 'FaraID'}`;
     } else {
         document.title = "Deviz Reparație";
     }

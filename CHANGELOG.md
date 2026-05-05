@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.4.6 — 2026-05-05
+### Update: Funcționalități Noi in Deviz
+- Sistem ID Unic (Smart Update): Trecerea de la salvarea simplă la managementul pe bază de ID (D-XXXX). Acum poți redeschide și edita același deviz pe parcursul mai multor zile fără a crea duplicate.
+- Auto-Increment ID: Butonul "Deviz Nou" generează acum automat următorul număr de deviz, facilitând organizarea cronologică.
+- Extindere Bază de Date (Coloana H): Adăugarea coloanei pentru Discount Global, permițând salvarea și recalcularea automată a reducerilor aplicate întregului deviz.
+- Data este acum afișată și salvată în format european standard DD.MM.YYYY.
+- Nume Fișier Dinamic: Exportul PDF include acum ID-ul unic (ex: Deviz reparatie - CT24TVG - D-101.pdf), prevenind suprascrierea fișierelor vechi în calculator.
+
 ## v0.4.5 — 2026-05-04
 ### Update: Interfață (UI/UX) Constatări + Îmbunătățiri
 - Reorganizare Header Card: s-a adaugat data de intrare in sistem a masinii si data finalizare.
