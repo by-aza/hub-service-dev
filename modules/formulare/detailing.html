@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Management Detailing</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --pending: #f59e0b;
+            --work: #3b82f6;
+            --done: #64748b;
+            --bg: #f8fafc;
+            --bg-dark-1: #1f2937;
+            --bg-dark-2: #020617;
+            --bg-dark-3: #000000;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --text: #ffffff;
+            --muted: #cbd5e1;
+            --muted-2: #94a3b8;
+            --accent: #b450ff;
+            --accent-2: #8b5cf6;
+            --success: #22c55e;
+        }
+
+        body {
+            background: radial-gradient(circle at top, var(--bg-dark-1) 0, var(--bg-dark-2) 45%, var(--bg-dark-3) 100%);
+            margin: 0;
+            font-family: Segoe UI, sans-serif;
+            color: var(--text);
+            padding-top: 130px;
+            padding-left: 10px;
+            padding-right: 10px;
+            padding-bottom: 10px;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 9999;
+            background: radial-gradient(circle at top, var(--bg-dark-1) 0, var(--bg-dark-2) 45%, var(--bg-dark-3) 100%);
+            color: var(--text);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 15px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+            box-sizing: border-box;
+            gap: 12px;
+            position: fixed;
+        }
+
+        header::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--accent);
+            box-shadow: 0 0 10px rgba(180, 80, 255, 0.7);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 30px;
+            font-weight: 800;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn-archive {
+            background: #111827;
+            color: #e5e7eb;
+            border: 1px solid var(--card-border);
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.15s ease;
+            white-space: nowrap;
+        }
+
+        .btn-archive:hover {
+            background: #0f172a;
+        }
+
+        .btn-new {
+            background: transparent;
+            color: var(--success);
+            border: 2px solid var(--success);
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .btn-new:hover {
+            background: rgba(34, 197, 94, 0.15);
+        }
+
+        /* Containerul pentru cele 3 coloane */
+        .board-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .column {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 15px;
+            min-height: 80vh;
+        }
+
+        .column h2 {
+            font-size: 1.1rem;
+            margin-top: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text);
+        }
+
+        .count-badge {
+            background: #111827;
+            border: 1px solid var(--card-border);
+            color: var(--muted);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+
+        /* Stil Card */
+        .card {
+            background: var(--card-bg);
+            color: var(--text);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 15px;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            transform: scale(1.01);
+            box-shadow: 0 0 14px rgba(0,0,0,0.55);
+            z-index: 5;
+        }
+
+        .card.pending { border-left: 8px solid var(--pending); }
+        .card.in-progress { border-left: 8px solid var(--work); }
+        .card.done { border-left: 8px solid var(--done); }
+
+        .card h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: var(--text);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .time-range {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--muted-2);
+            white-space: nowrap;
+            text-align: right;
+            padding-top: 2px;
+        }
+
+        .card p {
+            margin: 5px 0;
+            font-size: 0.9rem;
+            color: var(--muted);
+        }
+
+        .card .time {
+            font-weight: bold;
+            color: var(--text);
+        }
+
+        .card .actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--card-border);
+            background: #0f172a;
+            color: #e2e8f0;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 700;
+            transition: 0.15s ease;
+        }
+
+        .btn-action:hover {
+            background: #111827;
+        }
+
+        .btn-action.btn-start {
+            background: #2563eb;
+            color: #ffffff;
+            border: none;
+        }
+
+        .btn-action.btn-start:hover {
+            background: #1e40af;
+        }
+
+        .btn-action.btn-finish {
+            background: var(--success);
+            color: #06210f;
+            border: none;
+        }
+
+        .btn-action.btn-finish:hover {
+            filter: brightness(0.95);
+        }
+
+        .btn-action.btn-delete {
+            background: #475569;
+            color: #e2e8f0;
+            border: none;
+        }
+
+        .btn-action.btn-delete:hover {
+            background: #334155;
+        }
+
+        .btn-action.btn-archive-action {
+            background: #111827;
+            color: #e5e7eb;
+            border: 1px solid var(--card-border);
+        }
+
+        .btn-action.btn-archive-action:hover {
+            background: #0f172a;
+        }
+
+        .wa-mini {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            margin-left: 8px;
+            border-radius: 999px;
+            background: var(--success);
+            text-decoration: none;
+        }
+
+        .wa-mini svg {
+            width: 14px;
+            height: 14px;
+            fill: #ffffff;
+        }
+
+        .btn-action.btn-whatsapp {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            border-color: #bbf7d0;
+        }
+
+        .btn-action.btn-whatsapp svg {
+            width: 14px;
+            height: 14px;
+            fill: #22c55e;
+        }
+
+        a.btn-action {
+            text-decoration: none;
+        }
+
+        .tel-link {
+            color: #93c5fd;
+            font-weight: 600;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+
+        .tel-link:hover {
+            color: #bfdbfe;
+        }
+
+        /* Modal / Formular (Ascuns initial) */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            padding: 18px;
+        }
+
+        .modal-content {
+            width: min(560px, 100%);
+            background: #0b1220;
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            box-shadow: 0 14px 45px rgba(0,0,0,0.6);
+            padding: 16px;
+            color: var(--text);
+            box-sizing: border-box;
+        }
+
+        .modal-content h3 {
+            margin: 0 0 12px 0;
+            font-size: 22px;
+            color: #b57aff;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 12px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border: 1px solid var(--card-border);
+            background: #0f172a;
+            color: #e5e7eb;
+            font-size: 15px;
+            box-sizing: border-box;
+        }
+        /* Meniu Tab-uri - Ascuns pe PC, vizibil pe Mobil */
+.tabs-mobile {
+    display: none;
+    gap: 5px;
+    margin-bottom: 15px;
+    padding: 0;
+    align-items: center;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 10px 14px;
+    border: none;
+    border-radius: 10px;
+    background: #111827;
+    color: #e5e7eb;
+    border: 1px solid var(--card-border);
+    font-weight: 800;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: 0.15s ease;
+}
+
+.tab-btn.active {
+    background: rgba(180, 80, 255, 0.22);
+    border-color: var(--accent);
+    box-shadow: 0 0 10px rgba(180, 80, 255, 0.35);
+    color: var(--text);
+}
+
+.tab-btn:hover {
+    background: #0f172a;
+}
+
+@media (max-width: 768px) {
+    .tabs-mobile { display: flex; }
+    body { padding-top: 110px; }
+    header { padding-top: 10px; padding-bottom: 10px; }
+    header::after { height: 2px; }
+    header h1 { font-size: 20px; }
+    
+    /* Ascundem toate coloanele implicit pe mobil */
+    .column { display: none; min-height: auto; }
+    
+    /* Afișăm doar coloana care are clasa 'active-tab' */
+    .column.active-tab { display: block; }
+    
+    .board-container { grid-template-columns: 1fr; }
+    .card .actions {
+        flex-direction: column; /* Pune butoanele unul sub altul pe mobil */
+    }
+    .tab-btn {
+        font-size: 0.7rem; /* Micșorăm puțin textul butoanelor de sus să nu se suprapună */
+        padding: 10px 10px;
+    }
+}
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="tabs-mobile">
+    <button class="tab-btn active" onclick="switchTab('col-pending', this)">📅 Programări</button>
+    <button class="tab-btn" onclick="switchTab('col-progress', this)">🛠️ În Lucru</button>
+    <button class="tab-btn" onclick="switchTab('col-done', this)">✅ Gata</button>
+</div>
+        <h1>Detailing</h1>
+        <div class="header-actions">
+            <a class="btn-archive" id="btnArchive" href="#" target="_blank" rel="noopener noreferrer">Arhivă</a>
+            <button class="btn-new" onclick="showModal()">+ Programare</button>
+        </div>
+    </header>
+
+    <div class="board-container">
+        <div class="column" id="col-pending">
+            <h2>Programări <span class="count-badge" id="count-pending">0</span></h2>
+            <div class="cards-list">
+                </div>
+        </div>
+
+        <div class="column" id="col-progress">
+            <h2>În Lucru <span class="count-badge" id="count-progress">0</span></h2>
+            <div class="cards-list"></div>
+        </div>
+
+        <div class="column" id="col-done">
+            <h2>Finalizate <span class="count-badge" id="count-done">0</span></h2>
+            <div class="cards-list"></div>
+        </div>
+    </div>
+
+    <div id="modalProgramare" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Programare Nouă</h3>
+            <input type="text" id="nrAuto" placeholder="Număr Înmatriculare (ex: CT 01 ABC)">
+            <input type="datetime-local" id="dataOra">
+            <input type="text" id="clientTel" placeholder="Telefon Client">
+            <input type="text" id="serviciu" placeholder="Serviciu (ex: Polish, Colantare)">
+            <input type="number" id="pret" placeholder="Preț Estimat">
+            <textarea id="observatii" placeholder="Observații..."></textarea>
+            
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-new" style="flex: 1;" onclick="saveData()">Salvează</button>
+                <button class="btn-action" style="flex: 1;" onclick="hideModal()">Anulează</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalEdit" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Editează Programarea</h3>
+            <input type="text" id="editNrAuto" placeholder="Număr Înmatriculare (ex: CT 01 ABC)">
+            <input type="text" id="editServiciu" placeholder="Serviciu (ex: Polish, Colantare)">
+            <input type="number" id="editPret" placeholder="Preț Estimat">
+            <textarea id="editObservatii" placeholder="Observații..."></textarea>
+            
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-new" style="flex: 1;" onclick="saveEdit()">Salvează</button>
+                <button class="btn-action" style="flex: 1;" onclick="hideEditModal()">Anulează</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalReady" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Mașina e gata!</h3>
+            <p style="margin: 0; color: var(--muted);">Trimite mesaj clientului pe WhatsApp.</p>
+
+            <div style="display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap;">
+                <a id="readyWaLink" class="btn-action btn-whatsapp" href="#" target="_blank" rel="noopener noreferrer">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.455-.148-.67-.148-.23 0-.437.05-.62.148-.183.099-.366.247-.544.446-.178.198-.32.445-.426.742-.106.297-.158.619-.158.966 0 .346.052.668.158.965.106.297.248.545.426.743.178.198.361.346.544.445.183.1.39.149.62.149.215 0 .397-.049.544-.148.147-.099.32-.247.52-.446.199-.198.342-.445.426-.742.084-.297.126-.619.126-.966 0-.346-.042-.668-.126-.965-.084-.297-.227-.545-.426-.743-.199-.198-.373-.346-.52-.445-.147-.1-.329-.149-.544-.149-.215 0-.422.05-.62.149-.198.099-.341.247-.426.445-.084.198-.126.42-.126.668 0 .248.042.47.126.669.085.198.228.346.426.445.198.099.405.149.62.149.215 0 .397-.05.544-.149.147-.1.32-.247.52-.445.199-.198.342-.446.426-.743.084-.297.126-.619.126-.966zM12.004 0C5.384 0 0 5.384 0 12.004c0 2.108.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413A11.783 11.783 0 0012.004 0z"/>
+                    </svg>
+                    Trimite mesaj WhatsApp
+                </a>
+                <button class="btn-action" type="button" onclick="hideReadyModal()">Închide</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // URL-ul tău de la New Deployment (îl vei pune tu)
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxHAFR1wLlMxdCfhdNyIm2NfP-Eae7chlaLbD7JpCZZSRQkaU3vBVmR0UNgtP0N2jY/exec";
+const SHEET_URL = window.CONFIG?.VITE_DETAILING_SHEET_URL || "https://docs.google.com/spreadsheets/d/1R19JQMELZFc37dtEpEtQwtP58KS4DKKJJq4Zwiw8vLM/edit?gid=0#gid=0";
+
+let editContext = null;
+
+function initArchiveLink() {
+    const el = document.getElementById("btnArchive");
+    if (!el) return;
+
+    if (!SHEET_URL || /script\.google\.com\/macros\//i.test(SHEET_URL)) {
+        el.href = "#";
+        el.addEventListener("click", (e) => {
+            e.preventDefault();
+            alert("Setează `window.CONFIG.VITE_DETAILING_SHEET_URL` cu link-ul către Google Sheets (nu Apps Script).");
+        });
+        return;
+    }
+
+    el.href = SHEET_URL;
+}
+
+function showReadyModal(waUrl) {
+    const overlay = document.getElementById("modalReady");
+    const link = document.getElementById("readyWaLink");
+    if (!overlay || !link) return;
+    link.href = waUrl || "#";
+    overlay.style.display = "flex";
+}
+
+function hideReadyModal() {
+    const overlay = document.getElementById("modalReady");
+    if (overlay) overlay.style.display = "none";
+}
+
+function switchTab(columnId, btnElement) {
+    // 1. Gestionăm butoanele
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    btnElement.classList.add('active');
+
+    // 2. Gestionăm coloanele
+    document.querySelectorAll('.column').forEach(col => col.classList.remove('active-tab'));
+    document.getElementById(columnId).classList.add('active-tab');
+    
+    // Scroll sus automat când schimbi tab-ul
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Setăm prima coloană ca activă la start pe mobil
+document.addEventListener('DOMContentLoaded', () => {
+    initArchiveLink();
+    if (window.innerWidth <= 768) {
+        document.getElementById('col-pending').classList.add('active-tab');
+    }
+});
+
+// Funcție pentru afișare Modal
+function showModal() { 
+    document.getElementById('modalProgramare').style.display = 'flex'; 
+}
+
+function hideModal() { 
+    document.getElementById('modalProgramare').style.display = 'none'; 
+}
+
+function showEditModal() {
+    document.getElementById('modalEdit').style.display = 'flex';
+}
+
+function hideEditModal() {
+    document.getElementById('modalEdit').style.display = 'none';
+    editContext = null;
+}
+
+function openEditForRow(row) {
+    const dataAdaugare = String(row?.[0] ?? "").trim();
+    const nr = String(row?.[2] ?? "").trim().toUpperCase();
+    const dataOra = String(row?.[1] ?? "").trim();
+    const telefon = String(row?.[3] ?? "").trim();
+    const svc = String(row?.[4] ?? "").trim();
+    const pret = row?.[5] ?? "";
+    const status = String(row?.[6] ?? "").trim();
+    const obs = String(row?.[7] ?? "").trim();
+    const dataFinalizare = String(row?.[8] ?? "").trim();
+    const dataIncepere = String(row?.[9] ?? "").trim();
+
+    editContext = {
+        dataAdaugare,
+        nrCheie: nr,
+        dataOraCheie: dataOra,
+        clientTelefon: telefon,
+        status,
+        dataFinalizare,
+        dataIncepere
+    };
+
+    document.getElementById("editNrAuto").value = nr;
+    document.getElementById("editServiciu").value = svc;
+    document.getElementById("editPret").value = pret;
+    document.getElementById("editObservatii").value = obs;
+
+    showEditModal();
+}
+
+async function saveEdit() {
+    const btn = document.querySelector('#modalEdit .btn-new');
+    btn.disabled = true;
+    btn.innerText = "Se salvează...";
+
+    try {
+        const nrNou = document.getElementById("editNrAuto").value.trim().toUpperCase();
+        const serviciuNou = document.getElementById("editServiciu").value.trim();
+        const pretNou = document.getElementById("editPret").value;
+        const obsNou = document.getElementById("editObservatii").value.trim();
+
+        if (!editContext?.nrCheie) {
+            alert("Eroare: lipsă cheie editare (Nr. Înmatriculare).");
+            return;
+        }
+
+        const payload = {
+            tipAplicatie: "detailing",
+            actiune: "UPDATE",
+            dataAdaugare: editContext.dataAdaugare,
+            nrInmatriculareCheie: editContext.nrCheie,
+            dataOraProgramareCheie: editContext.dataOraCheie,
+            dataOraProgramare: editContext.dataOraCheie,
+            nrInmatriculare: nrNou,
+            clientTelefon: editContext.clientTelefon,
+            serviciu: serviciuNou,
+            pret: pretNou,
+            status: editContext.status,
+            observatii: obsNou,
+            dataFinalizare: editContext.dataFinalizare,
+            dataIncepere: editContext.dataIncepere
+        };
+
+        const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            alert("Eroare la salvare (update). Verifică Apps Script.");
+            return;
+        }
+
+        hideEditModal();
+        await loadCards();
+    } catch (error) {
+        console.error("Eroare update:", error);
+        alert("Eroare la salvare (update).");
+    } finally {
+        btn.disabled = false;
+        btn.innerText = "Salvează";
+    }
+}
+
+// FUNCȚIA DE SALVARE
+async function saveData() {
+    const btn = document.querySelector('.modal-content .btn-new');
+    btn.disabled = true;
+    btn.innerText = "Se salvează...";
+
+    const payload = {
+        tipAplicatie: "detailing", // Cheia care îi spune scriptului unde să scrie
+        dataAdaugare: new Date().toLocaleDateString('ro-RO'),
+        dataOraProgramare: document.getElementById('dataOra').value,
+        nrInmatriculare: document.getElementById('nrAuto').value.trim().toUpperCase(),
+        clientTelefon: document.getElementById('clientTel').value.trim(),
+        serviciu: document.getElementById('serviciu').value.trim(),
+        pret: document.getElementById('pret').value,
+        status: "Pending", // Toate intră inițial la Programări
+        observatii: document.getElementById('observatii').value.trim(),
+        dataFinalizare: ""
+    };
+
+    try {
+        const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+            alert('Programare salvată cu succes!');
+            hideModal();
+            location.reload(); // Reîncărcăm pagina ca să vedem cardul nou
+        }
+    } catch (error) {
+        console.error('Eroare:', error);
+        alert('Eroare la salvare. Verifică URL-ul Scriptului.');
+    } finally {
+        btn.disabled = false;
+        btn.innerText = "Salvează";
+    }
+}
+
+// FUNCȚIA DE ÎNCĂRCARE DATE (Pentru afișarea cardurilor)
+async function loadCards() {
+    try {
+        const response = await fetch(`${SCRIPT_URL}?tip=detailing`);
+        const data = await response.json();
+        renderCards(data);
+    } catch (error) {
+        console.error('Eroare la încărcare:', error);
+    }
+}
+
+function pad2(n) {
+    return String(n).padStart(2, "0");
+}
+
+function formatDateTimeRo(value) {
+    const raw = String(value ?? "").trim();
+    if (!raw) return "";
+
+    const d = new Date(raw);
+    if (Number.isNaN(d.getTime())) {
+        const m = raw.match(/^(\d{1,2})[.\-/](\d{1,2})[.\-/](\d{4})(?:[ T](\d{1,2}):(\d{2}))?$/);
+        if (!m) return raw;
+        const dd = parseInt(m[1], 10);
+        const mm = parseInt(m[2], 10) - 1;
+        const yyyy = parseInt(m[3], 10);
+        const hh = m[4] ? parseInt(m[4], 10) : 0;
+        const min = m[5] ? parseInt(m[5], 10) : 0;
+        const d2 = new Date(yyyy, mm, dd, hh, min, 0, 0);
+        if (Number.isNaN(d2.getTime())) return raw;
+        const dd2 = pad2(d2.getDate());
+        const mm2 = pad2(d2.getMonth() + 1);
+        const yyyy2 = d2.getFullYear();
+        const hh2 = pad2(d2.getHours());
+        const min2 = pad2(d2.getMinutes());
+        return `${dd2}-${mm2}-${yyyy2} ${hh2}:${min2}`;
+    }
+
+    const dd = pad2(d.getDate());
+    const mm = pad2(d.getMonth() + 1);
+    const yyyy = d.getFullYear();
+    const hh = pad2(d.getHours());
+    const min = pad2(d.getMinutes());
+    return `${dd}-${mm}-${yyyy} ${hh}:${min}`;
+}
+
+function parseDateValue(value) {
+    const raw = String(value ?? "").trim();
+    if (!raw) return null;
+
+    const d = new Date(raw);
+    if (!Number.isNaN(d.getTime())) return d;
+
+    const m = raw.match(/^(\d{1,2})[.\-/](\d{1,2})[.\-/](\d{4})(?:[ T](\d{1,2}):(\d{2}))?$/);
+    if (!m) return null;
+    const dd = parseInt(m[1], 10);
+    const mm = parseInt(m[2], 10) - 1;
+    const yyyy = parseInt(m[3], 10);
+    const hh = m[4] ? parseInt(m[4], 10) : 0;
+    const min = m[5] ? parseInt(m[5], 10) : 0;
+    const d2 = new Date(yyyy, mm, dd, hh, min, 0, 0);
+    if (Number.isNaN(d2.getTime())) return null;
+    return d2;
+}
+
+function formatDateTimeCompact(value) {
+    const d = parseDateValue(value);
+    if (!d) return String(value ?? "").trim();
+    const dd = pad2(d.getDate());
+    const mm = pad2(d.getMonth() + 1);
+    const yyyy = d.getFullYear();
+    const hh = pad2(d.getHours());
+    const min = pad2(d.getMinutes());
+    return `${dd}.${mm}.${yyyy} ${hh}:${min}`;
+}
+
+function formatDateOnlyDotsYear(value) {
+    const d = parseDateValue(value);
+    if (!d) return String(value ?? "").trim();
+    return `${pad2(d.getDate())}.${pad2(d.getMonth() + 1)}.${d.getFullYear()}`;
+}
+
+function formatDateOnlyDashYear(value) {
+    const d = parseDateValue(value);
+    if (!d) return String(value ?? "").trim();
+    return `${pad2(d.getDate())}-${pad2(d.getMonth() + 1)}-${d.getFullYear()}`;
+}
+
+function isSameDay(a, b) {
+    return a.getFullYear() === b.getFullYear() &&
+        a.getMonth() === b.getMonth() &&
+        a.getDate() === b.getDate();
+}
+
+function formatDuration(ms) {
+    const totalMinutes = Math.max(0, Math.round(ms / 60000));
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    if (hours <= 0) return `${minutes}m`;
+    if (minutes <= 0) return `${hours}h`;
+    return `${hours}h ${minutes}m`;
+}
+
+function getWorkTimeLabel(status, startValue, endValue) {
+    if (status === "Pending") return "";
+    const start = parseDateValue(startValue);
+    const end = parseDateValue(endValue);
+
+    if (status === "In_Progress") {
+        const startLabel = start ? formatDateOnlyDotsYear(start) : "-";
+        return `${startLabel} / -`;
+    }
+
+    if (status === "Done") {
+        if (start && end) {
+            if (isSameDay(start, end)) {
+                return `${formatDateOnlyDashYear(start)} (${formatDuration(end.getTime() - start.getTime())})`;
+            }
+            return `${formatDateTimeCompact(start)} / ${formatDateTimeCompact(end)}`;
+        }
+        const startLabel = start ? formatDateTimeCompact(start) : "-";
+        const endLabel = end ? formatDateTimeCompact(end) : "-";
+        return `${startLabel} / ${endLabel}`;
+    }
+
+    return "";
+}
+
+function normalizePhoneToWhatsApp(rawTel) {
+    let digits = String(rawTel ?? "").replace(/\D/g, "");
+    if (!digits) return "";
+    if (digits.startsWith("0040")) digits = digits.slice(2);
+    if (digits.startsWith("07") && digits.length === 10) return "40" + digits.slice(1);
+    if (digits.startsWith("0") && digits.length === 10) return "40" + digits.slice(1);
+    if (digits.startsWith("7") && digits.length === 9) return "40" + digits;
+    if (digits.startsWith("40")) return digits;
+    return digits;
+}
+
+function normalizePhoneToTel(rawTel) {
+    return String(rawTel ?? "").replace(/\D/g, "");
+}
+
+function sendDetails(rawTel, dataOraIso, serviciu, pret) {
+    console.log("Mesaj trimis catre:", rawTel);
+    const waNumber = normalizePhoneToWhatsApp(rawTel);
+    if (!waNumber) return;
+
+    const when = formatDateTimeRo(dataOraIso);
+    const svc = String(serviciu ?? "").trim();
+    const price = String(pret ?? "").trim();
+
+    const message =
+        "PROGRAMARE IN DATA DE:\n" +
+        when + "\n" +
+        "Serviciu: " + svc + "\n" +
+        "Pret: " + price + " RON";
+
+    const url = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
+    window.open(url, "_blank", "noopener,noreferrer");
+}
+
+function buildReadyPickupUrl(rawTel, nrInmatriculare) {
+    const waNumber = normalizePhoneToWhatsApp(rawTel);
+    if (!waNumber) return "";
+    const plate = String(nrInmatriculare ?? "").trim();
+    const message = `Buna ziua! Masina dvs. cu numarul ${plate} este gata pentru ridicare. Va multumim!`;
+    return `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
+}
+
+function renderCards(rows) {
+    // Curățăm coloanele înainte de a le popula
+    const cols = {
+        'Pending': document.querySelector('#col-pending .cards-list'),
+        'In_Progress': document.querySelector('#col-progress .cards-list'),
+        'Done': document.querySelector('#col-done .cards-list')
+    };
+    
+    Object.values(cols).forEach(el => el.innerHTML = '');
+    
+    let counts = { 'Pending': 0, 'In_Progress': 0, 'Done': 0 };
+
+    const sortedRows = [...(rows || [])].sort((a, b) => {
+        const da = parseDateValue(a?.[0]) || parseDateValue(a?.[1]) || new Date(0);
+        const db = parseDateValue(b?.[0]) || parseDateValue(b?.[1]) || new Date(0);
+        return db.getTime() - da.getTime();
+    });
+
+    sortedRows.forEach(row => {
+        const status = row[6]; // Coloana G
+        if (!cols[status]) return;
+
+        counts[status]++;
+        
+        const card = document.createElement('div');
+        card.className = `card ${status.toLowerCase().replace('_', '-')}`;
+
+        const rawPhone = row[3] ?? "";
+        const telNumber = normalizePhoneToTel(rawPhone);
+        const waNumber = normalizePhoneToWhatsApp(rawPhone);
+        const dateTimeLabel = formatDateTimeRo(row[1]);
+        const startTimeValue = row[9] ?? "";
+        const endTimeValue = row[8] ?? "";
+        const workTimeLabel = getWorkTimeLabel(status, startTimeValue, endTimeValue);
+        
+        // Construim conținutul cardului
+        card.innerHTML = `
+            <div class="card-header">
+                <h3>${row[2]}</h3> <!-- Nr Inmatriculare -->
+                ${workTimeLabel ? `<div class="time-range">${workTimeLabel}</div>` : ``}
+            </div>
+            <p><span class="time">📅 ${dateTimeLabel}</span></p> <!-- Data/Ora Programare -->
+            <p>
+                👤
+                ${telNumber ? `<a href="tel:${telNumber}" class="tel-link">${rawPhone}</a>` : `${rawPhone}`}
+                ${waNumber ? `
+                    <a class="wa-mini" href="https://wa.me/${waNumber}" target="_blank" rel="noopener noreferrer" title="WhatsApp">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.455-.148-.67-.148-.23 0-.437.05-.62.148-.183.099-.366.247-.544.446-.178.198-.32.445-.426.742-.106.297-.158.619-.158.966 0 .346.052.668.158.965.106.297.248.545.426.743.178.198.361.346.544.445.183.1.39.149.62.149.215 0 .397-.049.544-.148.147-.099.32-.247.52-.446.199-.198.342-.445.426-.742.084-.297.126-.619.126-.966 0-.346-.042-.668-.126-.965-.084-.297-.227-.545-.426-.743-.199-.198-.373-.346-.52-.445-.147-.1-.329-.149-.544-.149-.215 0-.422.05-.62.149-.198.099-.341.247-.426.445-.084.198-.126.42-.126.668 0 .248.042.47.126.669.085.198.228.346.426.445.198.099.405.149.62.149.215 0 .397-.05.544-.149.147-.1.32-.247.52-.445.199-.198.342-.446.426-.743.084-.297.126-.619.126-.966zM12.004 0C5.384 0 0 5.384 0 12.004c0 2.108.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413A11.783 11.783 0 0012.004 0z"/>
+                        </svg>
+                    </a>
+                ` : ""}
+            </p> <!-- Telefon/Client -->
+            <p>🛠️ <b>${row[4]}</b></p> <!-- Serviciu -->
+            <p>💰 ${row[5]} RON</p> <!-- Pret -->
+            ${row[7] ? `<p style="font-style:italic; font-size:0.8rem;">📝 ${row[7]}</p>` : ''} <!-- Observatii -->
+            
+            <div class="actions">
+                ${status === 'Pending' ? `<button class="btn-action btn-start" type="button" data-action="start">▶️ Începe</button>` : ''}
+                ${status === 'In_Progress' ? `<button class="btn-action btn-finish" type="button" data-action="finish">✅ Finalizează</button>` : ''}
+                ${status === 'Pending' ? `<button class="btn-action btn-delete" type="button" data-action="trash">🗑️</button>` : ''}
+                ${status === 'Done' ? `<button class="btn-action btn-archive-action" type="button" data-action="trash">&#128230; Arhivă</button>` : ''}
+            </div>
+        `;
+
+        if (waNumber) {
+            const actions = card.querySelector(".actions");
+            const deleteBtn = actions?.querySelector(".btn-delete");
+            if (actions) {
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "btn-action btn-whatsapp";
+                btn.innerHTML = `
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.455-.148-.67-.148-.23 0-.437.05-.62.148-.183.099-.366.247-.544.446-.178.198-.32.445-.426.742-.106.297-.158.619-.158.966 0 .346.052.668.158.965.106.297.248.545.426.743.178.198.361.346.544.445.183.1.39.149.62.149.215 0 .397-.049.544-.148.147-.099.32-.247.52-.446.199-.198.342-.445.426-.742.084-.297.126-.619.126-.966 0-.346-.042-.668-.126-.965-.084-.297-.227-.545-.426-.743-.199-.198-.373-.346-.52-.445-.147-.1-.329-.149-.544-.149-.215 0-.422.05-.62.149-.198.099-.341.247-.426.445-.084.198-.126.42-.126.668 0 .248.042.47.126.669.085.198.228.346.426.445.198.099.405.149.62.149.215 0 .397-.05.544-.149.147-.1.32-.247.52-.445.199-.198.342-.446.426-.743.084-.297.126-.619.126-.966zM12.004 0C5.384 0 0 5.384 0 12.004c0 2.108.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413A11.783 11.783 0 0012.004 0z"/>
+                    </svg>
+                    Trimite Detalii
+                `;
+                btn.addEventListener("click", () => {
+                    sendDetails(rawPhone, row[1], row[4], row[5]);
+                });
+                if (deleteBtn) actions.insertBefore(btn, deleteBtn);
+                else actions.appendChild(btn);
+            }
+        }
+
+        const btnStart = card.querySelector('[data-action="start"]');
+        if (btnStart) {
+            btnStart.addEventListener("click", async () => {
+                await updateStatus(row[2], row[1], "In_Progress");
+            });
+        }
+
+        const btnFinish = card.querySelector('[data-action="finish"]');
+        if (btnFinish) {
+            btnFinish.addEventListener("click", async () => {
+                const { ok, text } = await updateStatus(row[2], row[1], "Done");
+                if (!ok) return;
+                if (!String(text || "").toLowerCase().includes("ok")) return;
+
+                const waUrl = buildReadyPickupUrl(rawPhone, row[2]);
+                if (!waUrl) return;
+                showReadyModal(waUrl);
+            });
+        }
+
+        const btnTrash = card.querySelector('[data-action="trash"]');
+        if (btnTrash) {
+            btnTrash.addEventListener("click", async () => {
+                if (status === "Pending") {
+                    const confirmed = confirm("Anulezi programarea?");
+                    if (!confirmed) return;
+                    await updateStatus(String(row[2] ?? "").trim(), row[1], "Anulat");
+                    return;
+                }
+                if (status === "Done") {
+                    await updateStatus(String(row[2] ?? "").trim(), row[1], "Arhivat");
+                }
+            });
+        }
+
+        card.addEventListener("click", (event) => {
+            if (status === "Done") return;
+            const target = event.target;
+            if (target && target.closest && (target.closest(".actions") || target.closest("button") || target.closest("a"))) {
+                return;
+            }
+            openEditForRow(row);
+        });
+        
+        cols[status].appendChild(card);
+    });
+
+    // Actualizăm numerele din insigne (badges)
+    document.getElementById('count-pending').innerText = counts['Pending'];
+    document.getElementById('count-progress').innerText = counts['In_Progress'];
+    document.getElementById('count-done').innerText = counts['Done'];
+}
+
+// Funcție pentru schimbarea statusului (Mutare card)
+async function updateStatus(nrAuto, dataOra, noulStatus) {
+    const nr = String(nrAuto ?? "").trim().toUpperCase();
+    const data = String(dataOra ?? "").trim();
+    const payload = {
+        tipAplicatie: "detailing",
+        nrInmatriculare: nr,
+        dataOraProgramare: data, // Aceasta este "cheia" de cautare
+        status: noulStatus
+    };
+
+    const response = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+    });
+
+    const text = await response.text().catch(() => "");
+    if (response.ok) {
+        await loadCards();
+        return { ok: true, text };
+    }
+    return { ok: false, text };
+}
+
+// Rulăm încărcarea la deschiderea paginii
+window.onload = loadCards;
+    </script>
+</body>
+</html>

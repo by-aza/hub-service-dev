@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.5.0 — 2026-05-10
+### Release: Modul Detailing
+- Organizarea fluxului de lucru în trei coloane active: Programări, În Lucru și Finalizate.
+- Update Inteligent (Backend): Rescrierea logicii Apps Script pentru a permite editarea datelor existente fără a crea rânduri duplicat.
+- Notificări WhatsApp: Integrarea butoanelor de trimitere automată a detaliilor programării și notificare de finalizare direct către client.
+- Monitorizare Timp: Înregistrarea automată a orei de începere și de finalizare, cu calcularea automată a duratei de lucru (ore/minute) pentru intervențiile din aceeași zi.
+- Interfață Mobilă (Mobile-First): Design compact cu butoane tip pictogramă și navigare prin tab-uri pentru utilizare rapidă în atelier.
+
 ## v0.4.6 — 2026-05-05
 ### Update: Funcționalități Noi in Deviz
 - Sistem ID Unic (Smart Update): Trecerea de la salvarea simplă la managementul pe bază de ID (D-XXXX). Acum poți redeschide și edita același deviz pe parcursul mai multor zile fără a crea duplicate.
