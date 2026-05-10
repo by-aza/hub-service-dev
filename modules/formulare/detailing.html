@@ -552,6 +552,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+window.addEventListener("keydown", (e) => {
+    if (e.altKey && e.key.toLowerCase() === "b") {
+        window.location.href = "../../index.html";
+    }
+});
+
 // Funcție pentru afișare Modal
 function showModal() { 
     document.getElementById('modalProgramare').style.display = 'flex'; 

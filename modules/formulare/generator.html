@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator - HUB Service Auto</title>
+    <style>
+        :root {
+            --bg-dark: #0b0f1a;
+            --card-dark: #161c2d;
+            --neon-blue: #3b82f6;
+            --neon-purple: #9333ea;
+            --neon-green: #10b981;
+            --neon-red: #ef4444;
+            --text-gold: #facc15;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg-dark);
+            color: #f8fafc;
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container { width: 100%; max-width: 450px; }
+
+        .hub-header {
+            position: sticky;
+            top: 0;
+            width: 100%;
+            max-width: none;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            background: transparent;
+            padding: 6px 15px;
+            z-index: 10;
+            gap: 10px;
+            align-self: stretch;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .hub-logo {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            object-fit: cover;
+            padding: 3px;
+            backdrop-filter: blur(6px);
+            transition: 0.25s ease;
+            box-shadow: 0 0 8px rgba(0,0,0,0.25);
+        }
+
+        .hub-title {
+            margin: 0;
+            color: var(--text-gold);
+            font-size: 1.25rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #8b5cf6;
+            color: white;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: 0.15s ease;
+            font-weight: 900;
+        }
+
+        .btn-back:hover {
+            box-shadow: 0 0 12px rgba(139, 92, 246, 0.6);
+            transform: translateY(-1px);
+        }
+
+        .header-line {
+            position: relative;
+            left: 0;
+            width: 100vw;
+            margin-left: calc(-50vw + 50%);
+            height: 2px;
+            background: #b450ff;
+            box-shadow: 0 0 10px rgba(180, 80, 255, 0.7);
+            z-index: 9;
+            margin-bottom: 18px;
+        }
+
+        @keyframes alertBlink {
+            0%, 100% { color: var(--text-gold); text-shadow: none; }
+            50% { color: var(--neon-red); text-shadow: 0 0 10px rgba(239, 68, 68, 0.6); }
+        }
+
+        .hub-title.alert {
+            animation: alertBlink 1.6s ease-in-out infinite;
+        }
+
+        /* FILTRE & STATS */
+        .filter-section { display: flex; gap: 8px; margin-bottom: 15px; }
+        input[type="date"] {
+            flex: 1; background: #1e293b; border: 1px solid #334155;
+            color: white; padding: 8px; border-radius: 8px;
+        }
+
+        .stats-header {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .stats-header .maintenance {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .stat-card {
+            background: var(--card-dark); padding: 15px; border-radius: 12px;
+            text-align: center; border-left: 4px solid var(--neon-blue);
+        }
+        .stat-card span { font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; }
+        .stat-card div { font-size: 1.4rem; font-weight: bold; color: var(--text-gold); margin-top: 5px; }
+
+        /* BUTONUL PRINCIPAL */
+        #mainBtn {
+            width: 100%; padding: 35px 0; border-radius: 20px; border: none;
+            font-size: 1.8rem; font-weight: 900; color: white; cursor: pointer;
+            transition: 0.3s; margin-bottom: 25px;
+        }
+        .btn-start { background: linear-gradient(135deg, #10b981, #059669); }
+        .btn-stop { background: linear-gradient(135deg, #ef4444, #b91c1c); animation: pulse 2s infinite; }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0px rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0px rgba(239, 68, 68, 0); }
+        }
+
+        /* ALIMENTARE */
+        .fuel-box {
+            background: #1e293b; padding: 15px; border-radius: 15px;
+            border: 1px dashed #334155;
+        }
+        .input-row { display: flex; gap: 8px; }
+        .input-row input { flex: 1; padding: 12px; border-radius: 8px; border: none; background: #0f172a; color: white; }
+        .input-row button { background: var(--neon-blue); color: white; border: none; padding: 0 15px; border-radius: 8px; cursor: pointer; }
+
+        #loader { position: fixed; top: 0; background: var(--neon-blue); width: 100%; text-align: center; font-size: 0.7rem; display: none; z-index: 100; }
+
+        .recent-history {
+            margin-top: 14px;
+            margin-bottom: 18px;
+            padding: 10px 12px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            border-radius: 12px;
+        }
+
+        .recent-history h3 {
+            margin: 0 0 8px 0;
+            font-size: 0.85rem;
+            color: #94a3b8;
+            font-weight: 900;
+        }
+
+        .history-item {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 8px;
+            padding: 6px 0;
+            border-top: 1px solid rgba(51, 65, 85, 0.55);
+            font-size: 0.78rem;
+            color: #cbd5e1;
+        }
+
+        .history-item:first-child { border-top: none; padding-top: 0; }
+
+        .history-date {
+            color: #94a3b8;
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+        }
+
+        .history-detail {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 520px) {
+            .hub-title { font-size: 1rem; letter-spacing: 0.6px; }
+            .hub-logo { width: 46px; height: 46px; }
+            .btn-back { padding: 8px 10px; font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="loader">SINCRONIZARE CLOUD...</div>
+
+<header class="hub-header">
+    <div class="header-left">
+        <img src="../../icons/logo.png" alt="Logo" class="hub-logo">
+        <h1 class="hub-title" id="pageTitle">EVIDENȚĂ GENERATOR</h1>
+    </div>
+</header>
+<div class="header-line"></div>
+
+<div class="container">
+    <div class="filter-section">
+        <input type="date" id="startDate" onchange="refreshData()">
+        <input type="date" id="endDate" onchange="refreshData()">
+    </div>
+
+    <div class="stats-header">
+        <div style="font-size:0.85rem; color:#94a3b8; font-weight:900;">STATISTICI</div>
+        <div class="maintenance">Mentenanță: <span id="maintenanceDate">-</span></div>
+    </div>
+    <div class="stats-grid">
+        <div class="stat-card"><span>Consum (L)</span><div id="statLiters">0.0</div></div>
+        <div class="stat-card"><span>Timp (Ore)</span><div id="statTime">0h 0m</div></div>
+    </div>
+
+    <button id="mainBtn" onclick="toggleGenerator()">...</button>
+
+    <div class="fuel-box">
+        <h3 style="margin: 0 0 10px 0; font-size: 0.9rem; color: #94a3b8;">⛽ Alimentare Motorină</h3>
+        <div class="input-row">
+            <input type="number" id="fuelInput" placeholder="Litri...">
+            <button onclick="addFuel()">OK</button>
+        </div>
+    </div>
+
+    <div class="recent-history">
+        <h3>Istoric Recent</h3>
+        <div id="historyRecent"></div>
+    </div>
+</div>
+
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyoOyvjMx_xluQbmSqqNoHYhx99jZQDpSHBDQXrOc0W99iA27OscGlDPOONsmvLKpOO/exec";
+    
+    // Scurtătura ALT + B pentru Back
+    document.addEventListener('keydown', (e) => {
+        if (e.altKey && e.key.toLowerCase() === 'b') {
+            window.location.href = '../../index.html'; 
+        }
+    });
+
+    const azi = new Date().toISOString().split('T')[0];
+    document.getElementById('startDate').value = azi;
+    document.getElementById('endDate').value = azi;
+
+    function formatHistoryItem(item) {
+        const date = String(item?.date ?? item?.data ?? item?.timestamp ?? "").trim();
+        const action = String(item?.action ?? item?.type ?? item?.tip ?? "").trim();
+        const detail = String(item?.detail ?? item?.details ?? item?.detalii ?? "").trim();
+        const text = [action, detail].filter(Boolean).join(" • ");
+        return { date: date || "-", text: text || "-" };
+    }
+
+    function renderRecentHistory(history) {
+        const host = document.getElementById("historyRecent");
+        if (!host) return;
+        host.innerHTML = "";
+
+        const items = Array.isArray(history) ? history.slice(-3).reverse() : [];
+        if (!items.length) {
+            host.innerHTML = `<div style="font-size:0.78rem; color:#94a3b8;">-</div>`;
+            return;
+        }
+
+        for (const it of items) {
+            const { date, text } = formatHistoryItem(it);
+            const row = document.createElement("div");
+            row.className = "history-item";
+            row.innerHTML = `<div class="history-date">${date}</div><div class="history-detail">${text}</div>`;
+            host.appendChild(row);
+        }
+    }
+
+    function updateTitleAlert(running) {
+        const title = document.getElementById("pageTitle");
+        if (!title) return;
+        const now = new Date();
+        const after18 = now.getHours() >= 18;
+        title.classList.toggle("alert", !!running && after18);
+    }
+
+    async function refreshData() {
+        document.getElementById('loader').style.display = 'block';
+        try {
+            const resp = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: 'getData',
+                    start: document.getElementById('startDate').value,
+                    end: document.getElementById('endDate').value
+                })
+            });
+            const data = await resp.json();
+            
+            document.getElementById('statLiters').innerText = data.stats.liters + " L";
+            document.getElementById('statTime').innerText = data.stats.time;
+
+            const maint = document.getElementById("maintenanceDate");
+            if (maint) maint.innerText = String(data.maintenanceDate ?? "-");
+
+            renderRecentHistory(data.history);
+            
+            const btn = document.getElementById('mainBtn');
+            if (data.isRunning) {
+                btn.innerText = "OPREȘTE";
+                btn.className = "btn-stop";
+                btn.dataset.action = "stop";
+            } else {
+                btn.innerText = "PORNEȘTE";
+                btn.className = "btn-start";
+                btn.dataset.action = "start";
+            }
+
+            updateTitleAlert(!!data.isRunning);
+        } catch(e) { console.error("Eroare API"); }
+        document.getElementById('loader').style.display = 'none';
+    }
+
+    async function toggleGenerator() {
+        const btn = document.getElementById('mainBtn');
+        const action = btn.dataset.action;
+        await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: action }) });
+        refreshData();
+    }
+
+    async function addFuel() {
+        const lit = document.getElementById('fuelInput').value;
+        if(!lit) return;
+        await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'addFuel', liters: lit }) });
+        document.getElementById('fuelInput').value = "";
+        refreshData();
+    }
+
+    window.onload = refreshData;
+
+    setInterval(() => {
+        const btn = document.getElementById("mainBtn");
+        const running = String(btn?.dataset?.action || "") === "stop";
+        updateTitleAlert(running);
+    }, 60000);
+</script>
+
+</body>
+</html>

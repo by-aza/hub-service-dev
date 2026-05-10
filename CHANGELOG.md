@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.6.0 — 2026-05-11
+### Release: Evidență Generator
+- Integrare Full-Stack: Implementarea unei pagini dedicate generator.html legată direct la Google Sheets printr-un API propriu în Apps Script.
+- Smart Button: Buton dinamic care detectează starea generatorului (Running/Stopped) la încărcare și își schimbă culoarea și funcția (Verde/Start -> Roșu/Stop).
+- Sistem de filtrare după perioadă (dată start/sfârșit) cu actualizarea instantanee a consumului de motorină și a orelor de funcționare.
+- Alimentare rapidă: Interfață simplificată pentru adăugarea litrilor de motorină direct din pagină.
+- Log de Activitate: Afișarea ultimelor 3 acțiuni (Pornire/Oprire/Alimentare) pentru o evidență rapidă fără consultarea tabelului.
+- Eliminarea butoanelor vizibile de "Back" din paginile operative (Detailing/Generator) pentru a preveni accesul accidental al tehnicienilor la datele administrative.
+- Implementarea combinației de taste Alt + B pentru navigarea rapidă între module (doar pentru utilizatorii care cunosc scurtătura).
+
 ## v0.5.0 — 2026-05-10
 ### Release: Modul Detailing
 - Organizarea fluxului de lucru în trei coloane active: Programări, În Lucru și Finalizate.

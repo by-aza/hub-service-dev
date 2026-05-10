@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hub-cache-v1';
+const CACHE_NAME = 'hub-cache-v2';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -6,10 +6,12 @@ const urlsToCache = [
   '/css/style.css',
   '/js/theme.js',
   '/icon.png',
-  '/modules/formulare/detailing.html'
+  '/modules/formulare/detailing.html',
+  '/modules/formulare/generator.html'
 ];
 
 self.addEventListener('install', event => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
@@ -19,11 +21,31 @@ self.addEventListener('install', event => {
 });
 
 self.addEventListener('fetch', event => {
+  const req = event.request;
+  const accept = req.headers.get('accept') || '';
+  const isHtml = req.mode === 'navigate' || accept.includes('text/html');
+
   event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        return response || fetch(event.request);
-      })
+    (async () => {
+      if (isHtml) {
+        try {
+          const networkRes = await fetch(req);
+          const cache = await caches.open(CACHE_NAME);
+          cache.put(req, networkRes.clone());
+          return networkRes;
+        } catch (e) {
+          const cached = await caches.match(req);
+          if (cached) return cached;
+          return caches.match('/index.html');
+        }
+      }
+
+      const cached = await caches.match(req);
+      if (cached) return cached;
+
+      const networkRes = await fetch(req);
+      return networkRes;
+    })()
   );
 });
 
@@ -38,6 +60,6 @@ self.addEventListener('activate', event => {
           }
         })
       );
-    })
+    }).then(() => self.clients.claim())
   );
 });
