@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.7.2 — 2026-05-13
+### Release: Gestiune AWB (Logistics)
+- Tracking Dinamic: Implementarea unui sistem de tracking precis. Link-ul AWB se adaptează automat în funcție de curierul selectat (Fan, Cargus, Dragon Star, Sameday).
+- Smart Money Widget: Adăugarea unui contor în timp real pentru sumele aflate „în tranzit”. Valoarea se actualizează automat la schimbarea statusului.
+- Status-Driven UI: Cardurile de expediție își schimbă culoarea bordurii și a prețului în mod dinamic:
+  - În Tranzit (Galben/Standard)
+  - Livrat (Verde - scade din totalul de încasat)
+  - Retur (Roșu - alertă vizuală critică pentru preț și bordură)
+- Quick Actions: Integrarea butoanelor de apel direct și WhatsApp rapid direct pe cardul de expediție.
+
 ## v0.6.0 — 2026-05-11
 ### Release: Evidență Generator
 - Integrare Full-Stack: Implementarea unei pagini dedicate generator.html legată direct la Google Sheets printr-un API propriu în Apps Script.

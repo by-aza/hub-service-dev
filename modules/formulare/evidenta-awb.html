@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evidență AWB - HUB Service</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #0b0f1a; /* Fundalul tău din HUB */
+            --card-dark: #161c2d;
+            --neon-purple: #9333ea;
+            --neon-blue: #3b82f6;
+            --text-gold: #facc15;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #ca8a04;
+            --bg-gradient: radial-gradient(circle at top, #1f2937 0, #020617 45%, #000 100%);
+        }
+
+        body { 
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: #f8fafc;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .container { max-width: 650px; margin: 0 auto; padding: 0 10px; }
+
+        .page {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .top-shell {
+            position: sticky;
+            top: 0;
+            z-index: 2000;
+            width: 100%;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            padding: 0;
+        }
+
+        .list-shell {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow: auto;
+            padding: 0 0 20px 0;
+        }
+
+        .hub-header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 15px 20px 10px 20px;
+            background: transparent;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .header-logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            padding: 4px;
+            backdrop-filter: blur(6px);
+            transition: 0.25s ease;
+            box-shadow: 0 0 8px rgba(0,0,0,0.15);
+        }
+
+        .header-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-gold);
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .hub-btn {
+            display: inline-block;
+            background: #8b5cf6;
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid #8b5cf6;
+            cursor: pointer;
+            white-space: nowrap;
+            text-decoration: none;
+            font-size: 15px;
+            transition: 0.2s;
+            flex: 0 0 auto;
+        }
+
+        .hub-btn:hover {
+            background: #8b5cf6;
+            box-shadow: 0 0 12px rgba(139, 92, 246, 0.6);
+            transform: translateY(-1px);
+        }
+
+        .header-line {
+            width: 100%;
+            height: 2px;
+            background: #b450ff;
+            box-shadow: 0 0 12px rgba(180, 80, 255, 0.7);
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 700px) {
+            .header-logo {
+                width: 52px;
+                height: 52px;
+                padding: 2px;
+            }
+            .header-title {
+                font-size: 18px;
+            }
+            .hub-btn {
+                padding: 8px 10px;
+                font-size: 0.9rem;
+            }
+            .hub-header {
+                padding: 10px 12px 8px 12px;
+            }
+        }
+
+        /* WIDGET & SEARCH */
+        .money-widget {
+            background: rgba(22, 28, 45, 0.8);
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            border: 1px solid #334155; text-align: center;
+        }
+        .money-widget div { font-size: 1.5rem; font-weight: bold; color: var(--success); }
+
+        .search-box {
+            width: 100%; padding: 12px; background: var(--card-dark);
+            border: 1px solid #334155; border-radius: 8px; color: white;
+            margin-bottom: 15px; box-sizing: border-box;
+        }
+
+        /* CARD COMPACT CU CULORI DINAMICE */
+        .awb-card {
+            background: var(--card-dark); border-radius: 8px; padding: 12px;
+            margin-bottom: 10px; transition: 0.3s;
+            /* Bordura se schimbă prin JS (border-left) */
+        }
+
+        .awb-row-1 { display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 1.05rem; }
+        .awb-row-2 { display: flex; flex-wrap: wrap; gap: 8px; font-size: 0.85rem; color: #94a3b8; margin: 6px 0; padding-top: 6px; border-top: 1px solid #1e293b; }
+        
+        .awb-number-link { color: var(--neon-blue); text-decoration: underline; cursor: pointer; }
+        
+        /* ACTIUNI */
+        .actions-row { display: flex; gap: 6px; margin-top: 10px; }
+        .btn-small { 
+            flex: 1; padding: 8px; border-radius: 5px; border: none; 
+            cursor: pointer; color: white; font-size: 0.75rem;
+            display: flex; align-items: center; justify-content: center; gap: 5px;
+            text-transform: uppercase; font-weight: bold;
+        }
+
+        /* MODAL */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: var(--card-dark); padding: 20px; border-radius: 12px; width: 90%; max-width: 380px; }
+        .modal-content input, .modal-content select { width: 100%; padding: 12px; margin: 8px 0; border-radius: 6px; background: #0f172a; border: 1px solid #334155; color: white; box-sizing: border-box; }
+
+        .fab { position: fixed; bottom: 25px; right: 25px; background: var(--neon-purple); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; color: white; border: none; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.6); }
+    </style>
+</head>
+<body>
+
+<div class="page">
+    <div class="top-shell">
+        <header class="hub-header">
+            <div class="header-left">
+                <img src="../../icons/logo.png" alt="Logo" class="header-logo">
+                <h1 class="header-title">Evidență AWB</h1>
+            </div>
+            <a href="../../index.html" class="hub-btn">← Înapoi la HUB</a>
+        </header>
+        <div class="header-line"></div>
+
+        <div class="container">
+            <div class="money-widget">
+                <div id="totalInTranzit">0 RON ÎN TRANZIT</div>
+            </div>
+
+            <input type="text" class="search-box" id="searchInput" placeholder="Caută Client, AWB, Oraș..." onkeyup="filterAWB()">
+        </div>
+    </div>
+
+    <div class="list-shell">
+        <div class="container">
+            <div id="awbList"></div>
+        </div>
+    </div>
+</div>
+
+<button class="fab" onclick="showModal()"><i class="fas fa-plus"></i></button>
+
+<div class="modal" id="addModal">
+    <div class="modal-content">
+        <h3 style="margin: 0 0 10px 0; color: var(--text-gold);">Adaugă Expediție</h3>
+        <select id="curier">
+            <option value="cargus">Cargus</option>
+            <option value="dragon">Dragon Star</option>
+            <option value="fan">Fan Courier</option>
+            <option value="sameday">Sameday</option>
+        </select>
+        <input type="text" id="awbNumber" placeholder="Număr AWB">
+        <input type="text" id="clientName" placeholder="Nume Client">
+        <input type="text" id="oras" placeholder="Oraș Destinație">
+        <input type="text" id="piesa" placeholder="Denumire Piesă">
+        <input type="number" id="pret" placeholder="Preț / Ramburs">
+        <input type="tel" id="telefon" placeholder="Telefon Client">
+        
+        <button class="btn-small" style="background: var(--neon-purple); padding: 14px; width: 100%; margin-top: 10px;" onclick="saveAWB()">SALVEAZĂ</button>
+        <button class="btn-small" style="background: #334155; width: 100%; margin-top: 8px;" onclick="hideModal()">ANULEAZĂ</button>
+    </div>
+</div>
+
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwWIlBrzPScKDWmZJT6qYuIjs9XHqRsMEq-VGk1eJ5PjOqSB0ve9GjhP3p7MIk9ey85/exec";
+    let ALL_DATA = [];
+
+    const trackingLinks = {
+        cargus: "https://www.cargus.ro/find-shipment-results/?awb=",
+        dragon: "https://dragonstar.ro/urmarire-colet/?awb=",
+        fan: "https://www.fancourier.ro/awb-tracking/?awb=",
+        sameday: "https://sameday.ro/#tracking-home?awb="
+    };
+
+    async function loadData() {
+        try {
+            const resp = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'getAWBData' }) });
+            ALL_DATA = await resp.json();
+            ALL_DATA.sort((a, b) => b.row - a.row); 
+            renderList(ALL_DATA);
+        } catch (e) { document.getElementById('awbList').innerHTML = "Eroare conexiune."; }
+    }
+
+    function renderList(data) {
+        const container = document.getElementById('awbList');
+        container.innerHTML = "";
+        let inTranzitSum = 0;
+
+        data.forEach(item => {
+            if (item.status === "In Tranzit") inTranzitSum += item.pret;
+
+            // Logica Culori Dinamice
+            let statusColor = "var(--warning)";
+            let priceStyle = "color: var(--text-gold)";
+            if(item.status === "Livrat") statusColor = "var(--success)";
+            if(item.status === "Retur") {
+                statusColor = "var(--danger)";
+                priceStyle = "color: var(--danger)"; // Pretul devine rosu la retur
+            }
+
+            const trackBase = trackingLinks[item.curier] || trackingLinks.fan;
+            const trackUrl = trackBase + item.awb;
+
+            container.innerHTML += `
+                <div class="awb-card" style="border-left: 4px solid ${statusColor}">
+                    <div class="awb-row-1">
+                        <span>${item.client}</span>
+                        <span style="${priceStyle}">${item.pret} RON</span>
+                    </div>
+                    <div class="awb-row-2">
+                        <span>AWB: <b class="awb-number-link" onclick="window.open('${trackUrl}', '_blank')">${item.awb}</b></span>
+                        <span>| ${item.oras}</span>
+                        <span>| ${item.piesa}</span>
+                    </div>
+                    <div class="actions-row">
+                        <button class="btn-small" style="background: ${statusColor}; flex: 1.5;" onclick="changeStatus('${item.awb}', '${item.status}')">
+                            ${item.status} <i class="fas fa-sync"></i>
+                        </button>
+                        <button class="btn-small" style="background: #2563eb;" onclick="window.location.href='tel:${item.telefon}'">
+                            <i class="fas fa-phone"></i> APEL
+                        </button>
+                        <button class="btn-small" style="background: #16a34a;" onclick="window.open('https://wa.me/4${item.telefon}', '_blank')">
+                            <i class="fab fa-whatsapp"></i> WA
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+        document.getElementById('totalInTranzit').innerText = inTranzitSum + " RON ÎN TRANZIT";
+    }
+
+    function filterAWB() {
+        const q = document.getElementById('searchInput').value.toLowerCase();
+        renderList(ALL_DATA.filter(i => i.client.toLowerCase().includes(q) || i.awb.toString().includes(q) || i.oras.toLowerCase().includes(q) || i.piesa.toLowerCase().includes(q)));
+    }
+
+    async function changeStatus(awb, current) {
+        const next = current === "In Tranzit" ? "Livrat" : (current === "Livrat" ? "Retur" : "In Tranzit");
+        await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'updateStatus', awb: awb, newStatus: next }) });
+        loadData();
+    }
+
+    async function saveAWB() {
+        const payload = {
+            curier: document.getElementById('curier').value,
+            awb: document.getElementById('awbNumber').value,
+            client: document.getElementById('clientName').value,
+            oras: document.getElementById('oras').value,
+            piesa: document.getElementById('piesa').value,
+            pret: document.getElementById('pret').value,
+            telefon: document.getElementById('telefon').value
+        };
+        if (!payload.awb || !payload.client) return alert("AWB și Client sunt obligatorii!");
+        
+        await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'addAWB', payload: payload }) });
+        hideModal();
+        loadData();
+        // Reset câmpuri
+        document.querySelectorAll('.modal-content input').forEach(i => i.value = "");
+    }
+
+    function showModal() { document.getElementById('addModal').style.display = 'flex'; }
+    function hideModal() { document.getElementById('addModal').style.display = 'none'; }
+    
+    document.addEventListener('keydown', (e) => { 
+        if (e.altKey && e.key.toLowerCase() === 'b') window.location.href = '../../index.html'; 
+    });
+
+    window.onload = loadData;
+</script>
+</body>
+</html>
