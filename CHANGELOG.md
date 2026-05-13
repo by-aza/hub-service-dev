@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.7.3 — 2026-05-13
+### Update: Fix butoane
+- Evidență AWB: Funcțională, cu tracking inteligent, sume în tranzit și design compact pentru PC/Mobil.
+- Generator: Istoric corect (Data/Litri/Ore) și butoane securizate anti-dublu-click.
+- Detailing: Butoane securizate (se dezactivează la apăsare) pentru a evita dublurile în tabel.
+
 ## v0.7.2 — 2026-05-13
 ### Release: Gestiune AWB (Logistics)
 - Tracking Dinamic: Implementarea unui sistem de tracking precis. Link-ul AWB se adaptează automat în funcție de curierul selectat (Fan, Cargus, Dragon Star, Sameday).
