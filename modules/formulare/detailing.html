@@ -224,6 +224,17 @@
             transition: 0.15s ease;
         }
 
+        .btn-action:disabled,
+        .btn-new:disabled,
+        .is-disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .is-disabled {
+            pointer-events: none;
+        }
+
         .btn-action:hover {
             background: #111827;
         }
@@ -516,6 +527,11 @@ function initArchiveLink() {
     }
 
     el.href = SHEET_URL;
+    el.addEventListener("click", () => {
+        el.classList.add("is-disabled");
+        el.setAttribute("aria-disabled", "true");
+        el.tabIndex = -1;
+    });
 }
 
 function showReadyModal(waUrl) {
@@ -958,6 +974,7 @@ function renderCards(rows) {
         const btnStart = card.querySelector('[data-action="start"]');
         if (btnStart) {
             btnStart.addEventListener("click", async () => {
+                btnStart.disabled = true;
                 await updateStatus(row[2], row[1], "In_Progress");
             });
         }
@@ -965,6 +982,7 @@ function renderCards(rows) {
         const btnFinish = card.querySelector('[data-action="finish"]');
         if (btnFinish) {
             btnFinish.addEventListener("click", async () => {
+                btnFinish.disabled = true;
                 const { ok, text } = await updateStatus(row[2], row[1], "Done");
                 if (!ok) return;
                 if (!String(text || "").toLowerCase().includes("ok")) return;
@@ -981,10 +999,12 @@ function renderCards(rows) {
                 if (status === "Pending") {
                     const confirmed = confirm("Anulezi programarea?");
                     if (!confirmed) return;
+                    btnTrash.disabled = true;
                     await updateStatus(String(row[2] ?? "").trim(), row[1], "Anulat");
                     return;
                 }
                 if (status === "Done") {
+                    btnTrash.disabled = true;
                     await updateStatus(String(row[2] ?? "").trim(), row[1], "Arhivat");
                 }
             });

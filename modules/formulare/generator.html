@@ -36,7 +36,8 @@
             display: flex;
             align-items: center;
             justify-content: flex-start;
-            background: transparent;
+            background: rgba(11, 15, 26, 0.92);
+            backdrop-filter: blur(8px);
             padding: 6px 15px;
             z-index: 10;
             gap: 10px;
@@ -150,6 +151,12 @@
             font-size: 1.8rem; font-weight: 900; color: white; cursor: pointer;
             transition: 0.3s; margin-bottom: 25px;
         }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
         .btn-start { background: linear-gradient(135deg, #10b981, #059669); }
         .btn-stop { background: linear-gradient(135deg, #ef4444, #b91c1c); animation: pulse 2s infinite; }
 
@@ -188,7 +195,7 @@
 
         .history-item {
             display: grid;
-            grid-template-columns: auto 1fr;
+            grid-template-columns: 1fr;
             gap: 8px;
             padding: 6px 0;
             border-top: 1px solid rgba(51, 65, 85, 0.55);
@@ -197,12 +204,6 @@
         }
 
         .history-item:first-child { border-top: none; padding-top: 0; }
-
-        .history-date {
-            color: #94a3b8;
-            font-variant-numeric: tabular-nums;
-            white-space: nowrap;
-        }
 
         .history-detail {
             overflow: hidden;
@@ -250,7 +251,7 @@
         <h3 style="margin: 0 0 10px 0; font-size: 0.9rem; color: #94a3b8;">⛽ Alimentare Motorină</h3>
         <div class="input-row">
             <input type="number" id="fuelInput" placeholder="Litri...">
-            <button onclick="addFuel()">OK</button>
+            <button id="fuelOkBtn" onclick="addFuel()">OK</button>
         </div>
     </div>
 
@@ -261,7 +262,7 @@
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyoOyvjMx_xluQbmSqqNoHYhx99jZQDpSHBDQXrOc0W99iA27OscGlDPOONsmvLKpOO/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyKLIueHOcSZ351yYLHccblPLbRz94DI4clYeCg6ca_yb67pgjwJHMrvfhxkZ_lFfvzOw/exec";
     
     // Scurtătura ALT + B pentru Back
     document.addEventListener('keydown', (e) => {
@@ -274,12 +275,19 @@
     document.getElementById('startDate').value = azi;
     document.getElementById('endDate').value = azi;
 
-    function formatHistoryItem(item) {
-        const date = String(item?.date ?? item?.data ?? item?.timestamp ?? "").trim();
-        const action = String(item?.action ?? item?.type ?? item?.tip ?? "").trim();
-        const detail = String(item?.detail ?? item?.details ?? item?.detalii ?? "").trim();
-        const text = [action, detail].filter(Boolean).join(" • ");
-        return { date: date || "-", text: text || "-" };
+    function getHistoryText(item) {
+        const text = String(item?.text ?? item?.Text ?? "").trim();
+        if (text) return text;
+
+        const label = String(item?.label ?? item?.Label ?? "").trim();
+        const value = String(item?.valoare ?? item?.value ?? item?.Value ?? "").trim();
+
+        if (label && value) {
+            if (/[：:]\s*$/.test(label)) return `${label} ${value}`;
+            return `${label}: ${value}`;
+        }
+
+        return label || value || "-";
     }
 
     function renderRecentHistory(history) {
@@ -287,17 +295,16 @@
         if (!host) return;
         host.innerHTML = "";
 
-        const items = Array.isArray(history) ? history.slice(-3).reverse() : [];
+        const items = Array.isArray(history) ? history.slice(0, 2) : [];
         if (!items.length) {
             host.innerHTML = `<div style="font-size:0.78rem; color:#94a3b8;">-</div>`;
             return;
         }
 
         for (const it of items) {
-            const { date, text } = formatHistoryItem(it);
             const row = document.createElement("div");
             row.className = "history-item";
-            row.innerHTML = `<div class="history-date">${date}</div><div class="history-detail">${text}</div>`;
+            row.innerHTML = `<div class="history-detail">${getHistoryText(it)}</div>`;
             host.appendChild(row);
         }
     }
@@ -349,17 +356,30 @@
 
     async function toggleGenerator() {
         const btn = document.getElementById('mainBtn');
+        if (btn && btn.disabled) return;
+        if (btn) btn.disabled = true;
         const action = btn.dataset.action;
-        await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: action }) });
-        refreshData();
+        try {
+            await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: action }) });
+            await refreshData();
+        } finally {
+            if (btn) btn.disabled = false;
+        }
     }
 
     async function addFuel() {
+        const okBtn = document.getElementById("fuelOkBtn");
+        if (okBtn && okBtn.disabled) return;
+        if (okBtn) okBtn.disabled = true;
         const lit = document.getElementById('fuelInput').value;
-        if(!lit) return;
-        await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'addFuel', liters: lit }) });
-        document.getElementById('fuelInput').value = "";
-        refreshData();
+        try {
+            if(!lit) return;
+            await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'addFuel', liters: lit }) });
+            document.getElementById('fuelInput').value = "";
+            await refreshData();
+        } finally {
+            if (okBtn) okBtn.disabled = false;
+        }
     }
 
     window.onload = refreshData;

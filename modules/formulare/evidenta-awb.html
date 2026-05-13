@@ -178,6 +178,11 @@
             text-transform: uppercase; font-weight: bold;
         }
 
+        .btn-small:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
         /* MODAL */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; }
         .modal-content { background: var(--card-dark); padding: 20px; border-radius: 12px; width: 90%; max-width: 380px; }
@@ -290,7 +295,7 @@
                         <span>| ${item.piesa}</span>
                     </div>
                     <div class="actions-row">
-                        <button class="btn-small" style="background: ${statusColor}; flex: 1.5;" onclick="changeStatus('${item.awb}', '${item.status}')">
+                        <button class="btn-small" style="background: ${statusColor}; flex: 1.5;" onclick="changeStatus(this, '${item.awb}', '${item.status}')">
                             ${item.status} <i class="fas fa-sync"></i>
                         </button>
                         <button class="btn-small" style="background: #2563eb;" onclick="window.location.href='tel:${item.telefon}'">
@@ -311,10 +316,16 @@
         renderList(ALL_DATA.filter(i => i.client.toLowerCase().includes(q) || i.awb.toString().includes(q) || i.oras.toLowerCase().includes(q) || i.piesa.toLowerCase().includes(q)));
     }
 
-    async function changeStatus(awb, current) {
+    async function changeStatus(btn, awb, current) {
+        if (btn && btn.disabled) return;
+        if (btn) btn.disabled = true;
         const next = current === "In Tranzit" ? "Livrat" : (current === "Livrat" ? "Retur" : "In Tranzit");
-        await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'updateStatus', awb: awb, newStatus: next }) });
-        loadData();
+        try {
+            await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'updateStatus', awb: awb, newStatus: next }) });
+            await loadData();
+        } catch (e) {
+            if (btn) btn.disabled = false;
+        }
     }
 
     async function saveAWB() {
