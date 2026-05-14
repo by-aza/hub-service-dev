@@ -232,8 +232,8 @@
 
 <div class="container">
     <div class="filter-section">
-        <input type="date" id="startDate" onchange="refreshData()">
-        <input type="date" id="endDate" onchange="refreshData()">
+        <input type="date" id="startDate" onchange="loadData()">
+        <input type="date" id="endDate" onchange="loadData()">
     </div>
 
     <div class="stats-header">
@@ -262,7 +262,7 @@
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyKLIueHOcSZ351yYLHccblPLbRz94DI4clYeCg6ca_yb67pgjwJHMrvfhxkZ_lFfvzOw/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzBTIGZejk5l0KPnMJhsR8Kzx741tgZbvMs7pQL_9On1L_dFDqCkWvFdg5xdWxwspXrQw/exec";
     
     // Scurtătura ALT + B pentru Back
     document.addEventListener('keydown', (e) => {
@@ -271,9 +271,9 @@
         }
     });
 
-    const azi = new Date().toISOString().split('T')[0];
-    document.getElementById('startDate').value = azi;
-    document.getElementById('endDate').value = azi;
+    function getTodayIsoDate() {
+        return new Date().toISOString().split('T')[0];
+    }
 
     function getHistoryText(item) {
         const text = String(item?.text ?? item?.Text ?? "").trim();
@@ -317,15 +317,17 @@
         title.classList.toggle("alert", !!running && after18);
     }
 
-    async function refreshData() {
+    async function loadData(start, end) {
         document.getElementById('loader').style.display = 'block';
         try {
+            const startValue = (start ?? document.getElementById('startDate').value);
+            const endValue = (end ?? document.getElementById('endDate').value);
             const resp = await fetch(SCRIPT_URL, {
                 method: 'POST',
                 body: JSON.stringify({
                     action: 'getData',
-                    start: document.getElementById('startDate').value,
-                    end: document.getElementById('endDate').value
+                    start: startValue,
+                    end: endValue
                 })
             });
             const data = await resp.json();
@@ -354,6 +356,10 @@
         document.getElementById('loader').style.display = 'none';
     }
 
+    function refreshData() {
+        return loadData();
+    }
+
     async function toggleGenerator() {
         const btn = document.getElementById('mainBtn');
         if (btn && btn.disabled) return;
@@ -361,7 +367,7 @@
         const action = btn.dataset.action;
         try {
             await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: action }) });
-            await refreshData();
+            await loadData();
         } finally {
             if (btn) btn.disabled = false;
         }
@@ -376,13 +382,20 @@
             if(!lit) return;
             await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'addFuel', liters: lit }) });
             document.getElementById('fuelInput').value = "";
-            await refreshData();
+            await loadData();
         } finally {
             if (okBtn) okBtn.disabled = false;
         }
     }
 
-    window.onload = refreshData;
+    window.onload = () => {
+        const today = getTodayIsoDate();
+        const startInput = document.getElementById('startDate');
+        const endInput = document.getElementById('endDate');
+        if (startInput) startInput.value = today;
+        if (endInput) endInput.value = today;
+        return loadData(today, today);
+    };
 
     setInterval(() => {
         const btn = document.getElementById("mainBtn");
