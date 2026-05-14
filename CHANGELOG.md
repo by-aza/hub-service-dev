@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.7.4 — 2026-05-14
+### Update: Fix butoane+Fix Generator statistics
+- Evidență AWB: Funcțională, cu tracking inteligent, sume în tranzit și design compact pentru PC/Mobil.
+- Generator: Istoric corect (Data/Litri/Ore) și butoane securizate anti-dublu-click.
+- Detailing: Butoane securizate (se dezactivează la apăsare) pentru a evita dublurile în tabel.
+
 ## v0.7.3 — 2026-05-13
 ### Update: Fix butoane
 - Evidență AWB: Funcțională, cu tracking inteligent, sume în tranzit și design compact pentru PC/Mobil.
